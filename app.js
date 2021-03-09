@@ -7,22 +7,11 @@ const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 const index = require('./routes/index')
 const users = require('./routes/users')
-const static = require("koa-static");
 const session = require("koa-session");
-const cors = require('koa2-cors');
-//const {proxyTable,proxy} = require("./proxy");
+const log = require("./middleware/log");
 
 onerror(app)
-
-/*
-
-Object.keys(proxyTable).map(context => {//代理服务器
-  const options = proxyTable[context]
-  // 使用代理
-  app.use(proxy(context, options))
-})
-*/
-
+app.use(log);//日志记录
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))

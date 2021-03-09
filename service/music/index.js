@@ -7,14 +7,11 @@ const success = {status:"success"};
 const fail = {status:"fail"}
 const {Base64} = require('js-base64');
 const router = new Router();
-const moment = require('moment');
 const request = require('request');
-function zerofull (value){//零填充
-    if(value<10){
-        return "0"+value
-    }
-    return value
-}
+const jsonwebtoken = require("jsonwebtoken");
+const {SECRET} = require("../../config");
+const {getFullTime} = require("../../utils/common")
+
 
 //获取推荐音乐数据,请求地地址：/service/music/getDiscList
 router.get("/getDiscList",async(ctx)=>{
@@ -324,6 +321,7 @@ router.get("/getUserData",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
         if(ctx.session.userId){
             connection.query("SELECT avater FROM user WHERE user_id=?",ctx.session.userId,(error,response)=>{
+                // ctx.state = { oparation : "获取用户信息",method:"getUserData"};
                 let avater = "";
                 if(response[0].avater){
                     avater = response[0].avater
@@ -332,30 +330,42 @@ router.get("/getUserData",async(ctx)=>{
                     let index = Math.floor(Math.random()*files.length);
                     avater = `/images/avater/public/${files[index]}`;
                 }
+                let userDate = {
+                    userId:ctx.session.userId,
+                    name:ctx.session.userId,
+                    avater
+                }
+                let token = jsonwebtoken.sign(
+                    userDate,  // 加密userToken
+                    SECRET,
+                    { expiresIn: '365d'}
+                );
                 resolve({
                     ...success,
                     msg:"",
-                    data:{
-                        userId:ctx.session.userId,
-                        name:ctx.session.userId,
-                        avater
-                    },
-
+                    token,
+                    data:userDate,
                 })
             })
         }else{
 
             let files = fs.readdirSync(path.resolve(__dirname,"../../public/images/avater/public"));
             let index = Math.floor(Math.random()*files.length);
+            let userData = {
+                userId:"",
+                name:files[index].replace(/\..+/g,""),
+                avater:`/images/avater/public/${files[index]}`
+            };
+            let token = jsonwebtoken.sign(
+                userData,  // 加密userToken
+                SECRET,
+                { expiresIn: '365d'}
+            );
             resolve({
                 ...success,
                 msg:"",
-                data:{
-                    userId:"",
-                    name:files[index].replace(/\..+/g,""),
-                    avater:`/images/avater/public/${files[index]}`
-                }
-
+                token,
+                data:userData
             })
         }
     });
@@ -406,8 +416,8 @@ router.post("/addFavorite",async(ctx)=>{
         let data = [];
         let item = ctx.request.body;
         let {id,albummid,duration,image,local_image="",mid,name,singer,url,userId,lyric="",local_url,play_mode,kugou_url} = item;
-        let update_time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-        let create_time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+        let update_time = getFullTime();
+        let create_time = getFullTime();
         if(!play_mode)play_mode = null;
         data.push(id,albummid,duration,image,local_image,mid,name,singer,url,userId,create_time,lyric,local_url,play_mode,update_time,kugou_url);//参数字段
         let params =[id,albummid,duration,image,local_image,mid,name,singer,url,create_time,update_time,lyric,userId,albummid];//插入抖音的参数
@@ -518,7 +528,7 @@ router.get("/getDouyinList",async(ctx)=>{
 //记录播放和抖音歌曲的播放次数,请求地地址：/service/music/record
 router.put("/record",async(ctx)=>{
     let item = ctx.request.body;
-    let timer =  moment(new Date()).format('YYYY-MM-DD HH:mm:ss');//当前时间
+    let timer =  getFullTime();//当前时间
     let {id,albummid,duration,image,mid,name,singer,url,userId} = item
     let data = [[id,albummid,duration,image,mid,name,singer,url,userId,timer]]
     let result = await new Promise((resolve,reject)=>{

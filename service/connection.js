@@ -2,8 +2,8 @@ var mysql=require("mysql");
 var pool = mysql.createPool({
     host: 'localhost',
     user:'root',
-    password:'wwq_2020',
-    database:'music',
+    password:'wwq_2021',
+    database:'play',
     multipleStatements: true
 });
 
