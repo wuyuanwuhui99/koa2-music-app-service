@@ -319,54 +319,39 @@ router.post("/register",async(ctx)=>{
 //获取用户信息,请求地地址：/service/music/getUserData
 router.get("/getUserData",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
-        if(ctx.session.userId){
-            connection.query("SELECT avater FROM user WHERE user_id=?",ctx.session.userId,(error,response)=>{
-                // ctx.state = { oparation : "获取用户信息",method:"getUserData"};
-                let avater = "";
-                if(response[0].avater){
-                    avater = response[0].avater
-                }else{
-                    let files = fs.readdirSync(path.resolve(__dirname,"../../public/images/avater/public"));
-                    let index = Math.floor(Math.random()*files.length);
-                    avater = `/images/avater/public/${files[index]}`;
-                }
-                let userDate = {
-                    userId:ctx.session.userId,
-                    name:ctx.session.userId,
-                    avater
-                }
+        let token = ctx.req.headers.Authorization;
+        let userData = token ? jsonwebtoken.decode(token) : null;
+        if(userData){
+            connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE user_id = ?",userData.userId,(error,response)=>{
+                let userData = JSON.parse(JSON.stringify(response[0]));
                 let token = jsonwebtoken.sign(
-                    userDate,  // 加密userToken
+                    userData,  // 加密userToken
                     SECRET,
-                    { expiresIn: '365d'}
+                    { expiresIn: '365d',algorithm: 'HS256'}
                 );
                 resolve({
                     ...success,
                     msg:"",
                     token,
-                    data:userDate,
+                    data:userData
                 })
             })
         }else{
-
-            let files = fs.readdirSync(path.resolve(__dirname,"../../public/images/avater/public"));
-            let index = Math.floor(Math.random()*files.length);
-            let userData = {
-                userId:"",
-                name:files[index].replace(/\..+/g,""),
-                avater:`/images/avater/public/${files[index]}`
-            };
-            let token = jsonwebtoken.sign(
-                userData,  // 加密userToken
-                SECRET,
-                { expiresIn: '365d'}
-            );
-            resolve({
-                ...success,
-                msg:"",
-                token,
-                data:userData
+            connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE role ='public'  order by rand() LIMIT 1",(error,response)=>{
+                let userData = JSON.parse(JSON.stringify(response[0]));
+                let token = jsonwebtoken.sign(
+                    userData ,  // 加密userToken
+                    SECRET,
+                    { expiresIn: 60*60*24*365,algorithm: 'HS256'}
+                );
+                resolve({
+                    ...success,
+                    msg:"",
+                    token,
+                    data: userData
+                })
             })
+
         }
     });
     ctx.body = result;
@@ -398,7 +383,26 @@ router.get("/queryFavorite",async(ctx)=>{
         if(!mid || !userId){//没有歌曲获取用户id
             resolve([]);
         }else{
-            connection.query("SELECT * FROM favorite_music WHERE mid = ? AND user_id = ?",[mid,userId],(err,result)=>{
+            connection.query(`SELECT 
+            id,
+            albummid,
+            duration,
+            mid,
+            name,
+            singer,
+            url,
+            create_time AS createTime,
+            timer,
+            update_time AS updateTime,
+            kugou_url AS kugouUrl,
+            play_mode AS playMode,
+            other_url AS otherUrl,
+            local_url AS localUrl,
+            disabled,
+            user_id AS userId,
+            lyric,
+            local_image AS localImage
+        FROM favorite_music WHERE mid = ? AND user_id = ?`,[mid,userId],(err,result)=>{
                 resolve({
                     data:result,
                     ...success,
@@ -415,12 +419,12 @@ router.post("/addFavorite",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
         let data = [];
         let item = ctx.request.body;
-        let {id,albummid,duration,image,local_image="",mid,name,singer,url,userId,lyric="",local_url,play_mode,kugou_url} = item;
-        let update_time = getFullTime();
-        let create_time = getFullTime();
-        if(!play_mode)play_mode = null;
-        data.push(id,albummid,duration,image,local_image,mid,name,singer,url,userId,create_time,lyric,local_url,play_mode,update_time,kugou_url);//参数字段
-        let params =[id,albummid,duration,image,local_image,mid,name,singer,url,create_time,update_time,lyric,userId,albummid];//插入抖音的参数
+        let {id,albummid,duration,image,localImage="",mid,name,singer,url,userId,lyric="",localUrl,playMode,kugouUrl} = item;
+        let updateTime = getFullTime();
+        let createTime = getFullTime();
+        if(!playMode)playMode = null;
+        data.push(id,albummid,duration,image,localImage,mid,name,singer,url,userId,createTime,lyric,localUrl,playMode,updateTime,kugouUrl);//参数字段
+        let params =[id,albummid,duration,image,localImage,mid,name,singer,url,createTime,updateTime,lyric,userId,albummid];//插入抖音的参数
         //往收藏表中插入一条数据，要管理员才能插入都抖音歌曲表
         connection.query(
             `INSERT INTO favorite_music(id,albummid,duration,image,local_image,mid,name,singer,url,user_id,create_time,lyric,local_url,play_mode,update_time,kugou_url) 
@@ -507,7 +511,27 @@ router.post("/deleteFavorite",async(ctx)=>{
 router.get("/getDouyinList",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
         //查询数据库
-        connection.query("SELECT id,albummid,duration,image,local_image,mid,name,singer,url,play_mode,kugou_url,local_url,other_url,lyric,update_time,create_time FROM douyin WHERE disabled = '0' order by update_time desc",(error,response)=>{
+        connection.query(`SELECT 
+            id,
+            albummid,
+            duration,
+            image,
+            mid,
+            name,
+            singer,
+            url,
+            create_time AS createTime,
+            timer,
+            update_time AS updateTime,
+            kugou_url AS kugouUrl,
+            play_mode AS playMode,
+            other_url AS otherUrl,
+            local_url AS localUrl,
+            disabled,
+            lyric,
+            local_image AS localImage,
+        FROM douyin 
+            WHERE disabled = '0' order by update_time desc`,(error,response)=>{
             if(error){
                 console.log("错误",error);
                 reject(error)
@@ -536,7 +560,7 @@ router.put("/record",async(ctx)=>{
         //https://www.cnblogs.com/hzj680539/p/8032270.html
         //返回的response[0]表示执行第一条sql的结果，response[1]表示执行第一条sql的结果
         connection.query(`
-            INSERT INTO record_music(id,albummid,duration,image,mid,name,singer,url,user_id,create_time) VALUES ?;
+            INSERT INTO record_music(id,albummid,duration,image,mid,name,singer,url,user_id AS userId,create_time) VALUES ?;
             UPDATE douyin SET timer = timer+1 WHERE id = ?;
             UPDATE douyin SET url=? WHERE id = ? AND url='';`,
             [data,id,url,id],(error,response)=>{
