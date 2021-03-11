@@ -9,6 +9,34 @@ const index = require('./routes/index')
 const users = require('./routes/users')
 const session = require("koa-session");
 const log = require("./middleware/log");
+const {createProxyMiddleware} = require('http-proxy-middleware')
+const koaConnect = require('koa2-connect')
+
+// 代理兼容封装
+const proxy = function (context, options) {
+  if (typeof options === 'string') {
+    options = {
+      target: options
+    }
+  }
+  return async function (ctx, next) {
+    await koaConnect(createProxyMiddleware(context, options))(ctx, next)
+  }
+}
+
+// 代理配置
+const proxyTable = {
+  '/static': {
+    target: 'http://localhost:3001',
+    changeOrigin: true
+  }
+}
+
+Object.keys(proxyTable).map(context => {
+  const options = proxyTable[context]
+  // 使用代理
+  app.use(proxy(context, options))
+})
 
 onerror(app)
 app.use(log);//日志记录

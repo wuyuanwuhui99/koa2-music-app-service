@@ -1,6 +1,6 @@
 const connection = require("../service/connection");
 const {getFullTime} = require("../utils/common");
-
+const jsonwebtoken = require("jsonwebtoken");
 module.exports =  async (ctx,next) => {
     if(ctx.originalUrl.includes("/service/music/")){
         var startDate = new  Date();
@@ -20,7 +20,8 @@ module.exports =  async (ctx,next) => {
         }
         var result = ctx.body;
         var runTime = runtime;
-        var userId = null;
+        var userData = jsonwebtoken.decode(ctx.req.headers.authorization);
+        var userId = userData ? userData.userId : null;
         var {description=null,method=null,oparation=null} = ctx.state;
         connection.query(`INSERT INTO log(
             method,url,headers,ip,params,result,start_time,run_time,description,end_time,oparation,type,user_id)

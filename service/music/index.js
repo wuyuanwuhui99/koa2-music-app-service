@@ -319,8 +319,8 @@ router.post("/register",async(ctx)=>{
 //获取用户信息,请求地地址：/service/music/getUserData
 router.get("/getUserData",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
-        let token = ctx.req.headers.Authorization;
-        let userData = token ? jsonwebtoken.decode(token) : null;
+        var token = ctx.req.headers.authorization;
+        var userData = token ? jsonwebtoken.decode(token) : null;
         if(userData){
             connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE user_id = ?",userData.userId,(error,response)=>{
                 let userData = JSON.parse(JSON.stringify(response[0]));
@@ -529,9 +529,9 @@ router.get("/getDouyinList",async(ctx)=>{
             local_url AS localUrl,
             disabled,
             lyric,
-            local_image AS localImage,
+            local_image AS localImage
         FROM douyin 
-            WHERE disabled = '0' order by update_time desc`,(error,response)=>{
+            WHERE disabled = '0' order by update_time desc limit 0 ,100`,(error,response)=>{
             if(error){
                 console.log("错误",error);
                 reject(error)
