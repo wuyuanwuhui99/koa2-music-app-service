@@ -10,7 +10,7 @@ const router = new Router();
 const request = require('request');
 const jsonwebtoken = require("jsonwebtoken");
 const {SECRET} = require("../../config");
-const {getFullTime} = require("../../utils/common")
+const {getFullTime} = require("../../utils/common");
 
 
 //获取推荐音乐数据,请求地地址：/service/music/getDiscList
@@ -25,7 +25,11 @@ router.get("/getDiscList",async(ctx)=>{
         params:ctx.query//请求参数
     }).then((response)=>{
         ctx.response.status = 200;//返回状态
-        ctx.body=response.data;//请求结果
+        ctx.body = {
+            ...success,
+            msg:"",
+            data:response.data//请求结果,
+        };
     }).catch((e)=>{
         console.log(e);
     })
@@ -55,7 +59,11 @@ router.get("/lyric",async(ctx)=>{
         connection.query("UPDATE douyin SET lyric=? WHERE mid=? AND lyric IS NULL",[encodeURIComponent(Base64.decode(res.lyric)),ctx.query.songmid],(error,response)=>{
             console.log(response)
         });
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"",
+            data:res//请求结果,
+        };
     }).catch((e)=>{
         console.log(e);
     })
@@ -71,10 +79,13 @@ router.get("/getSingerList",async(ctx)=>{
         let res =  response.data;
         if (typeof res === 'string') {
             var matches = res.trim().replace(/^getSingerList\(/,"").replace(/\)$/,"");
-            console.log(matches)
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取歌手列表成功",
+            data:res//请求结果,
+        };
     })
 });
 
@@ -88,14 +99,17 @@ router.get("/getHotKey",async(ctx)=>{
         let res =  response.data;
         if (typeof res === 'string') {
             var matches = res.trim().replace(/^getHotKey\(/,"").replace(/\)$/,"");
-            console.log(matches)
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取热门推荐成功",
+            data:res//请求结果,
+        };
     })
 });
 
-//获取热门推荐,请求地地址：/service/music/search
+//搜索,请求地地址：/service/music/search
 router.get("/search",async(ctx)=>{
     const url = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp';
     await axios.get(url,{
@@ -105,10 +119,13 @@ router.get("/search",async(ctx)=>{
         let res =  response.data;
         if (typeof res === 'string') {
             var matches = res.trim().replace(/^search\(/,"").replace(/\)$/,"");
-            console.log(matches)
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"搜索成功",
+            data:res//请求结果,
+        };
     })
 });
 
@@ -125,7 +142,11 @@ router.get("/getSingerDetail",async(ctx)=>{
             console.log(matches)
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取歌手歌曲成功",
+            data:res//请求结果,
+        };
     });
 });
 
@@ -139,10 +160,13 @@ router.get("/getRecommend",async(ctx)=>{
         let res =  response.data;
         if (typeof res === 'string'){
             var matches = res.trim().replace(/^getRecommend\(/,"").replace(/\)$/,"");
-            console.log(matches)
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取推荐列表成功",
+            data:res//请求结果,
+        };
     });
 })
 
@@ -163,7 +187,11 @@ router.get("/getSongList",async(ctx)=>{
             var matches = res.replace(/^playlistinfoCallback\(/,"").replace(/\)$/,"")
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取歌单数据成功",
+            data:res//请求结果,
+        };
     }).catch((e)=>{
         console.log(e);
     })
@@ -181,7 +209,11 @@ router.get("/getTopList",async(ctx)=>{
             var matches = res.replace(/^getTopList\(/,"").replace(/\)$/,"")
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取排行版数据成功",
+            data:res//请求结果,
+        };
     });
 });
 
@@ -197,7 +229,11 @@ router.get("/getMusicList",async(ctx)=>{
             var matches = res.replace(/^getMusicList\(/,"").replace(/\)$/,"")
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取音乐列表成功",
+            data:res//请求结果,
+        };
     });
 });
 
@@ -213,7 +249,11 @@ router.get("/getAudioUrl",async(ctx)=>{
             var matches = res.replace(/^getAudioUrl\(/,"").replace(/\)$/,"")
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取歌曲的url成功",
+            data:res//请求结果,
+        };
     });
 });
 
@@ -230,7 +270,11 @@ router.get("/getSingleSong",async(ctx)=>{
             var matches = res.replace(/^getSingleSong\(/,"").replace(/\)$/,"")
             res=JSON.parse(matches)
         }
-        ctx.body = res;
+        ctx.body = {
+            ...success,
+            msg:"获取歌曲的key成功",
+            data:res//请求结果,
+        };
     });
 });
 
@@ -241,14 +285,16 @@ router.post("/login",async(ctx)=>{
         if(!userId || !password){
             reject({
                 ...fail,
-                msg:"账号或密码不能为空"
+                msg:"账号或密码不能为空",
+                data:null
             });
         }
         connection.query("SELECT * FROM user WHERE user_id = ? AND password = ?",[userId,password],(err,response)=>{
             if(err || response.length == 0){
                 reject({
                     ...fail,
-                    msg:"账号或密码不正确"
+                    msg:"账号或密码不正确",
+                    data:null
                 })
             }else{
                 ctx.session.userId = userId;
@@ -267,7 +313,6 @@ router.post("/login",async(ctx)=>{
                         name:userId,
                         avater
                     },
-
                 });
             }
         })
@@ -303,7 +348,7 @@ router.post("/register",async(ctx)=>{
                 let index = Math.floor(Math.random()*files.length);
                 resolve({
                     ...success,
-                    msg:"插入成功",
+                    msg:"注册成功",
                     data:{
                         name:userId,
                         avater:`/images/avater/public/${files[index]}`
@@ -319,20 +364,31 @@ router.post("/register",async(ctx)=>{
 //获取用户信息,请求地地址：/service/music/getUserData
 router.get("/getUserData",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
-        var token = ctx.req.headers.authorization;
+        var token = ctx.cookies.get("token");
         var userData = token ? jsonwebtoken.decode(token) : null;
         if(userData){
             connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE user_id = ?",userData.userId,(error,response)=>{
-                let userData = JSON.parse(JSON.stringify(response[0]));
-                let token = jsonwebtoken.sign(
+                var userData = JSON.parse(JSON.stringify(response[0]));
+                var token = jsonwebtoken.sign(
                     userData,  // 加密userToken
                     SECRET,
-                    { expiresIn: '365d',algorithm: 'HS256'}
+                    { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
                 );
+                ctx.cookies.set(
+                    'token',
+                    token,    //可替换为token
+                    {
+                        // domain: 'localhost',  // 写cookie所在的域名
+                        // path: '/',       // 写cookie所在的路径
+                        // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
+                        maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
+                        httpOnly: false,  // 是否只用于http请求中获取
+                        overwrite: false  // 是否允许重写
+                    }
+                )
                 resolve({
                     ...success,
-                    msg:"",
-                    token,
+                    msg:"获取用户信息成功",
                     data:userData
                 })
             })
@@ -342,12 +398,23 @@ router.get("/getUserData",async(ctx)=>{
                 let token = jsonwebtoken.sign(
                     userData ,  // 加密userToken
                     SECRET,
-                    { expiresIn: 60*60*24*365,algorithm: 'HS256'}
+                    { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
+                );
+                ctx.cookies.set(
+                    'token',
+                    token,    //可替换为token
+                    {
+                        // domain: 'localhost',  // 写cookie所在的域名
+                        // path: '/',       // 写cookie所在的路径
+                        // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
+                        maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
+                        httpOnly: false,  // 是否只用于http请求中获取
+                        overwrite: false  // 是否允许重写
+                    }
                 );
                 resolve({
                     ...success,
-                    msg:"",
-                    token,
+                    msg:"获取用户信息成功",
                     data: userData
                 })
             })
@@ -370,7 +437,6 @@ router.get("/getFavorite",async(ctx)=>{
                     ...success
                 })
             }
-            // connection.end();
         })
     });
     ctx.body = result;
@@ -406,7 +472,7 @@ router.get("/queryFavorite",async(ctx)=>{
                 resolve({
                     data:result,
                     ...success,
-                    msg:""
+                    msg:"查询成功",
                 })
             })
         }
@@ -433,11 +499,16 @@ router.post("/addFavorite",async(ctx)=>{
                 //要管理员才能插入都抖音歌曲表
                 if(!error){
                     if(response.affectedRows == 1){//response[0]表示第一条sql执行的结果
-                        resolve({...response,...success,msg:"收藏成功"});//不是管理员，不能插入抖音歌曲表
+                        resolve({//不是管理员，不能插入抖音歌曲表
+                            ...success,
+                            data:response,
+                            msg:"收藏成功"
+                        })
                     }else if(response.affectedRows == 0){//response[0]表示第一条sql执行的结果
                         reject({
                             ...fail,
-                            msg:"收藏失败"
+                            msg:"收藏失败",
+                            data:null
                         })
                     }
                     //如果是管理员账号，收藏之后添加到抖音歌曲表
@@ -475,7 +546,8 @@ router.post("/addFavorite",async(ctx)=>{
                 }else{
                     reject({
                         ...fail,
-                        msg:"收藏失败"
+                        msg:"收藏失败",
+                        data:null
                     })
                 }
             })
@@ -493,11 +565,16 @@ router.post("/deleteFavorite",async(ctx)=>{
                 reject(error)
             }else{
                 if(response.affectedRows == 1){
-                    resolve({...response,...success});
+                    resolve({
+                        ...success,
+                        data:response,
+                        msg:"取消收藏成功",
+                    })
                 }else{
                     resolve({
                         ...fail,
-                        msg:"您收藏的歌曲不存在"
+                        msg:"您收藏的歌曲不存在",
+                        data:null
                     })
                 }
 
@@ -536,14 +613,12 @@ router.get("/getDouyinList",async(ctx)=>{
                 console.log("错误",error);
                 reject(error)
             }else{
-                // resolve(response)
                 resolve({
                     msg:"查询成功",
                     ...success,
                     data:response
                 })
             }
-            // connection.end();
         })
     });
     ctx.body = result;
@@ -568,7 +643,11 @@ router.put("/record",async(ctx)=>{
                     console.log("错误",error);
                     reject(error)
                 }else{
-                    resolve({...response,...success})
+                    resolve({
+                        ...success,
+                        data:response,
+                        msg:"插入记录成功",
+                    })
                 }
             });
     })

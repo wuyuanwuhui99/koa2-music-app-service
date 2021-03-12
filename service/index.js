@@ -3,7 +3,6 @@ const Router = require("koa-router");
 
 let music = require("./music");//引入子路由
 let router = new Router();
-const fs = require('fs');
 router.use("/music",music.routes());
 
 router.get("/",async(ctx)=>{

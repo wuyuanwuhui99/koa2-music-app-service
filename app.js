@@ -11,6 +11,7 @@ const session = require("koa-session");
 const log = require("./middleware/log");
 const {createProxyMiddleware} = require('http-proxy-middleware')
 const koaConnect = require('koa2-connect')
+const setCookie = require("./middleware/setCookie");
 
 // 代理兼容封装
 const proxy = function (context, options) {
@@ -40,6 +41,7 @@ Object.keys(proxyTable).map(context => {
 
 onerror(app)
 app.use(log);//日志记录
+app.use(setCookie);//设置cookie
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))
