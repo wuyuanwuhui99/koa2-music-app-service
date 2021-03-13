@@ -1,3 +1,4 @@
 module.exports = {
-    SECRET:"wuwenqiang"
+    SECRET:"wuwenqiang",
+    ERR_OK: 0
 }
