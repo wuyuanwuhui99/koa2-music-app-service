@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="77feeb0a-a3bd-40e2-afc1-5b68e5e9d53d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/music/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/music/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middleware/filter.js" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/filter.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -17,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/service/music/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
-              <caret line="972" column="38" selection-start-line="972" selection-start-column="38" selection-end-line="972" selection-end-column="38" />
+            <state relative-caret-position="137">
+              <caret line="39" column="40" lean-forward="true" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -62,11 +60,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/middleware/filter.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="5" column="73" selection-start-line="5" selection-start-column="73" selection-end-line="5" selection-end-column="73" />
+            <state relative-caret-position="275">
+              <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -109,7 +107,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>http-proxy-middleware</find>
       <find>koaConnect</find>
       <find>koa2-connect</find>
       <find>httpProxyMiddleware</find>
@@ -139,6 +136,7 @@
       <find>login</find>
       <find>getFullTime</find>
       <find>jsonwebtoken.sign</find>
+      <find>ctx.resp</find>
     </findStrings>
     <replaceStrings>
       <replace>...fail</replace>
@@ -200,8 +198,8 @@
         <option value="$PROJECT_DIR$/utils/common.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/config/index.js" />
-        <option value="$PROJECT_DIR$/middleware/filter.js" />
         <option value="$PROJECT_DIR$/service/music/index.js" />
+        <option value="$PROJECT_DIR$/middleware/filter.js" />
       </list>
     </option>
   </component>
@@ -233,6 +231,17 @@
               <item name="music" type="b2602c69:ProjectViewProjectNode" />
               <item name="music" type="462c0819:PsiDirectoryNode" />
               <item name="middleware" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="music" type="b2602c69:ProjectViewProjectNode" />
+              <item name="music" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="music" type="b2602c69:ProjectViewProjectNode" />
+              <item name="music" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="music" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -366,12 +375,12 @@
       <workItem from="1615523242965" duration="762000" />
       <workItem from="1615561644404" duration="5559000" />
       <workItem from="1615598733332" duration="12946000" />
-      <workItem from="1615615328496" duration="4511000" />
+      <workItem from="1615615328496" duration="4874000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="273911000" />
+    <option name="totallyTimeSpent" value="274274000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
@@ -722,17 +731,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/middleware/filter.js">
+    <entry file="file://$PROJECT_DIR$/service/music/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="5" column="73" selection-start-line="5" selection-start-column="73" selection-end-line="5" selection-end-column="73" />
+        <state relative-caret-position="137">
+          <caret line="39" column="40" lean-forward="true" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="40" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/service/music/index.js">
+    <entry file="file://$PROJECT_DIR$/middleware/filter.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="972" column="38" selection-start-line="972" selection-start-column="38" selection-end-line="972" selection-end-column="38" />
+        <state relative-caret-position="275">
+          <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
         </state>
       </provider>
     </entry>
