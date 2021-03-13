@@ -3,13 +3,11 @@ const path = require("path");
 const Router = require("koa-router");
 const axios = require("axios");
 const connection = require("../connection");
-const success = {status:"success"};
-const fail = {status:"fail"}
 const {Base64} = require('js-base64');
 const router = new Router();
 const request = require('request');
 const jsonwebtoken = require("jsonwebtoken");
-const {SECRET,ERR_OK} = require("../../config");
+const {SECRET,ERR_OK,SUCCESS,FAIL} = require("../../config");
 const {getFullTime,getValue} = require("../../utils/common");
 
 
@@ -43,13 +41,13 @@ router.get("/getDiscList",async(ctx)=>{
         var res = response.data;//请求结果
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"",
                 data:res.data//请求结果,
             };
         }else {
             ctx.body = {
-                ...fail,
+                ...FAIL,
                 msg:res.message,
                 data:res.data//请求结果,
             };
@@ -100,7 +98,7 @@ router.get("/getLyric",async(ctx)=>{
         });
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"获取歌词成功",
                 data:{lyric:res.lyric}//请求结果,
             };
@@ -144,13 +142,13 @@ router.get("/getSingerList",async(ctx)=>{
         }
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"获取歌手列表成功",
                 data:res.data.list//请求结果,
             };
         }else {
             ctx.body = {
-                ...fail,
+                ...FAIL,
                 msg:res.message,
                 data:res.data//请求结果,
             };
@@ -186,13 +184,13 @@ router.get("/getHotKey",async(ctx)=>{
         }
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"获取热门推荐成功",
                 data:res.data//请求结果,
             };
         }else{
             ctx.body = {
-                ...fail,
+                ...FAIL,
                 msg:"获取热门推荐失败",
                 data:res.data//请求结果,
             };
@@ -242,13 +240,13 @@ router.get("/search",async(ctx)=>{
         }
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"搜索成功",
                 data:res.data//请求结果,
             };
         }else {
             ctx.body = {
-                ...fail,
+                ...FAIL,
                 msg:"搜索成功",
                 data:res.data//请求结果,
             };
@@ -281,18 +279,17 @@ router.get("/getSingerDetail",async(ctx)=>{
         let res =  response.data;
         if (typeof res === 'string') {
             var matches = res.trim().replace(/^getSingerDetail\(/,"").replace(/\)$/,"");
-            console.log(matches)
             res=JSON.parse(matches)
         }
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"获取歌手歌曲成功",
                 data:res.data//请求结果,
             };
         }else{
             ctx.body = {
-                ...fail,
+                ...FAIL,
                 msg:res.message,
                 data:res.data//请求结果,
             };
@@ -353,7 +350,7 @@ router.get("/getRecommend",async(ctx)=>{
         ctx.response.status = 200;//写入状态
         let list = getValue(response,["data","focus","data","shelf","v_niche","0","v_card"],[]);
         ctx.body = {
-            ...success,
+            ...SUCCESS,
             msg:"获取推荐列表成功",
             data:list//请求结果,
         };
@@ -398,13 +395,13 @@ router.get("/getSongList",async(ctx)=>{
         }
         if(res.code == ERR_OK){
             ctx.body = {
-                ...success,
+                ...SUCCESS,
                 msg:"获取歌单数据成功",
                 data:res.cdlist ? res.cdlist[0] :{}//请求结果,
             };
         }else{
             ctx.body = {
-                ...fail,
+                ...FAIL,
                 msg:res.message,
                 data:res.data//请求结果,
             };
@@ -428,7 +425,7 @@ router.get("/getTopList",async(ctx)=>{
             res=JSON.parse(matches)
         }
         ctx.body = {
-            ...success,
+            ...SUCCESS,
             msg:"获取排行版数据成功",
             data:res//请求结果,
         };
@@ -448,7 +445,7 @@ router.get("/getMusicList",async(ctx)=>{
             res=JSON.parse(matches)
         }
         ctx.body = {
-            ...success,
+            ...SUCCESS,
             msg:"获取音乐列表成功",
             data:res//请求结果,
         };
@@ -468,7 +465,7 @@ router.get("/getAudioUrl",async(ctx)=>{
             res=JSON.parse(matches)
         }
         ctx.body = {
-            ...success,
+            ...SUCCESS,
             msg:"获取歌曲的url成功",
             data:res//请求结果,
         };
@@ -532,7 +529,7 @@ router.get("/getSingleSong",async(ctx)=>{
             res=JSON.parse(matches)
         }
         ctx.body = {
-            ...success,
+            ...SUCCESS,
             msg:"获取歌曲的key成功",
             data:res//请求结果,
         };
@@ -545,7 +542,7 @@ router.post("/login",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
         if(!userId || !password){
             reject({
-                ...fail,
+                ...FAIL,
                 msg:"账号或密码不能为空",
                 data:null
             });
@@ -553,27 +550,33 @@ router.post("/login",async(ctx)=>{
         connection.query("SELECT * FROM user WHERE user_id = ? AND password = ?",[userId,password],(err,response)=>{
             if(err || response.length == 0){
                 reject({
-                    ...fail,
+                    ...FAIL,
                     msg:"账号或密码不正确",
                     data:null
                 })
             }else{
-                ctx.session.userId = userId;
-                let avater = "";
-                if(response[0].avater){
-                    avater = response[0].avater;
-                }else{
-                    let files = fs.readdirSync(path.resolve(__dirname,"../../public/images/avater/public"));
-                    let index = Math.floor(Math.random()*files.length);
-                    avater = `/images/avater/public/${files[index]}`;
-                }
+                var userData = JSON.parse(JSON.stringify(response[0]));
+                var token = jsonwebtoken.sign(
+                    userData,  // 加密userToken
+                    SECRET,
+                    { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
+                );
+                ctx.cookies.set(
+                    'token',
+                    token,    //可替换为token
+                    {
+                        // domain: 'localhost',  // 写cookie所在的域名
+                        // path: '/',       // 写cookie所在的路径
+                        // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
+                        maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
+                        httpOnly: false,  // 是否只用于http请求中获取
+                        overwrite: false  // 是否允许重写
+                    }
+                )
                 resolve({
-                    ...success,
+                    ...SUCCESS,
                     msg:"登录成功",
-                    data:{
-                        name:userId,
-                        avater
-                    },
+                    data:userData,
                 });
             }
         })
@@ -584,15 +587,9 @@ router.post("/login",async(ctx)=>{
 //登出,请求地地址：/service/music/logout
 router.get("/logout",async(ctx)=>{
     ctx.session.userId = "";
-    let files = fs.readdirSync(path.resolve(__dirname,"../../public/images/avater/public"));
-    let index = Math.floor(Math.random()*files.length);
     ctx.body = {
-        ...success,
+        ...SUCCESS,
         msg:"退出登录成功",
-        data:{
-            name:files[index].replace(/\..+/g,""),
-            avater:`/images/avater/public/${files[index]}`
-        }
     }
 })
 
@@ -605,14 +602,13 @@ router.post("/register",async(ctx)=>{
             if(err){
                 reject(err)
             }else{
-                let files = fs.readdirSync(path.resolve(__dirname,"../../public/images/avater/public"));
-                let index = Math.floor(Math.random()*files.length);
                 resolve({
-                    ...success,
+                    ...SUCCESS,
                     msg:"注册成功",
                     data:{
-                        name:userId,
-                        avater:`/images/avater/public/${files[index]}`
+                        userId,
+                        telephone,
+                        email
                     },
 
                 })
@@ -648,7 +644,7 @@ router.get("/getUserData",async(ctx)=>{
                     }
                 )
                 resolve({
-                    ...success,
+                    ...SUCCESS,
                     msg:"获取用户信息成功",
                     data:userData
                 })
@@ -674,7 +670,7 @@ router.get("/getUserData",async(ctx)=>{
                     }
                 );
                 resolve({
-                    ...success,
+                    ...SUCCESS,
                     msg:"获取用户信息成功",
                     data: userData
                 })
@@ -688,14 +684,16 @@ router.get("/getUserData",async(ctx)=>{
 //根据用户id查询收藏的歌曲,请求地地址：/service/music/getFavorite
 router.get("/getFavorite",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
-        connection.query("SELECT * FROM favorite_music WHERE user_id = ?",ctx.query.userId,function(err,response){
+        let token = ctx.cookies.get("token");
+        var userData = jsonwebtoken.decode(token);
+        connection.query("SELECT * FROM favorite_music WHERE user_id = ?",[userData ? userData.userId : ""],function(err,response){
             if(err){
                 reject(err)
             }else{
                 resolve({
                     data:[...response],
                     msg:"查询成功",
-                    ...success
+                    ...SUCCESS
                 })
             }
         })
@@ -732,7 +730,7 @@ router.get("/queryFavorite",async(ctx)=>{
         FROM favorite_music WHERE mid = ? AND user_id = ?`,[mid,userId],(err,result)=>{
                 resolve({
                     data:result,
-                    ...success,
+                    ...SUCCESS,
                     msg:"查询成功",
                 })
             })
@@ -761,13 +759,13 @@ router.post("/addFavorite",async(ctx)=>{
                 if(!error){
                     if(response.affectedRows == 1){//response[0]表示第一条sql执行的结果
                         resolve({//不是管理员，不能插入抖音歌曲表
-                            ...success,
+                            ...SUCCESS,
                             data:response,
                             msg:"收藏成功"
                         })
                     }else if(response.affectedRows == 0){//response[0]表示第一条sql执行的结果
                         reject({
-                            ...fail,
+                            ...FAIL,
                             msg:"收藏失败",
                             data:null
                         })
@@ -779,7 +777,7 @@ router.post("/addFavorite",async(ctx)=>{
                         if(url){//把歌曲下载到本地
                             let audioMatch = url.replace(/\?.+/,"").split(".");
                             let audioFilename =  name+"."+audioMatch[audioMatch.length-1];
-                            let audioRoot = path.resolve(__dirname,"../../","./public/audio/"+ audioFilename);
+                            let audioRoot = "E:\\static\\music\\audio\\"+ audioFilename;
                             let audioStream = fs.createWriteStream(audioRoot);
                             request(url).pipe(audioStream).on('close', ()=>{//下载文件成功后更新数据库
                                 connection.query("UPDATE douyin SET local_url = ?,play_mode='local' WHERE id=?",["/audio/"+audioFilename,id],(err,res)=>{
@@ -794,7 +792,7 @@ router.post("/addFavorite",async(ctx)=>{
                         if(image){//把图片下载到本地
                             let imgMatch = image.replace(/\?.+/g,"").split(".");
                             let imgFilename = name +"."+ imgMatch[imgMatch.length -1];
-                            let imgRoot = path.resolve(__dirname,"../../","./public/images/song/"+ imgFilename);
+                            let imgRoot = "E:\\static\\music\\images\\" + imgFilename;
                             let imgStream = fs.createWriteStream(imgRoot);
                             request(item.image).pipe(imgStream).on('close', ()=>{//下载文件成功后更新数据库
                                 connection.query("UPDATE douyin SET local_image = ? WHERE id = ?",["/images/song/"+imgFilename,id],(err,res)=>{
@@ -806,7 +804,7 @@ router.post("/addFavorite",async(ctx)=>{
                     });
                 }else{
                     reject({
-                        ...fail,
+                        ...FAIL,
                         msg:"收藏失败",
                         data:null
                     })
@@ -827,13 +825,13 @@ router.post("/deleteFavorite",async(ctx)=>{
             }else{
                 if(response.affectedRows == 1){
                     resolve({
-                        ...success,
+                        ...SUCCESS,
                         data:response,
                         msg:"取消收藏成功",
                     })
                 }else{
                     resolve({
-                        ...fail,
+                        ...FAIL,
                         msg:"您收藏的歌曲不存在",
                         data:null
                     })
@@ -876,7 +874,7 @@ router.get("/getDouyinList",async(ctx)=>{
             }else{
                 resolve({
                     msg:"查询成功",
-                    ...success,
+                    ...SUCCESS,
                     data:response
                 })
             }
@@ -905,12 +903,99 @@ router.post("/record",async(ctx)=>{
                     reject(error)
                 }else{
                     resolve({
-                        ...success,
+                        ...SUCCESS,
                         data:response,
                         msg:"插入记录成功",
                     })
                 }
             });
+    })
+    ctx.body = result
+});
+
+//修改用户信息,请求地地址：/service/music/updateUser
+router.post("/updateUser",async(ctx)=>{
+    let item = ctx.request.body;
+    let updateDate =  getFullTime();//当前时间
+    let {username,telephone,email,avater,birthday,sex,role,userId} = item;
+    let data = [updateDate,username,telephone,email,avater,birthday,sex,role,userId]
+    let result = await new Promise((resolve,reject)=>{
+        //向记录表中插入一条播放记录，同时更新抖音歌曲的播放次数
+        //https://www.cnblogs.com/hzj680539/p/8032270.html
+        //返回的response[0]表示执行第一条sql的结果，response[1]表示执行第一条sql的结果
+        connection.query(`
+            UPDATE user SET update_date = ?, username = ?, telephone=?, email= ? ,avater=?,birthday=?,sex=?,role=? WHERE user_id=? `,data,(error,response)=>{
+                if(error){
+                    console.log("错误",error);
+                    reject(error)
+                }else{
+                    if(response.affectedRows == 1){
+                        let token = jsonwebtoken.sign(
+                            userData ,  // 加密userToken
+                            {username,telephone,email,avater,birthday,sex,role,userId},
+                            { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
+                        );
+                        ctx.cookies.set(
+                            'token',
+                            token,    //可替换为token
+                            {
+                                // domain: 'localhost',  // 写cookie所在的域名
+                                // path: '/',       // 写cookie所在的路径
+                                // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
+                                maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
+                                httpOnly: false,  // 是否只用于http请求中获取
+                                overwrite: false  // 是否允许重写
+                            }
+                        );
+                        resolve({
+                            ...SUCCESS,
+                            data:response,
+                            msg:"修改账号信息成功",
+                        });
+                    }else{
+                        resolve({
+                            ...FAIL,
+                            msg:"修改账号信息失败",
+                            data:null
+                        })
+                    }
+                }
+            });
+    })
+    ctx.body = result
+});
+
+//修改密码,请求地地址：/service/music/updatePassword
+router.post("/updatePassword",async(ctx)=>{
+    let item = ctx.request.body;
+    let updateDate =  getFullTime();//当前时间
+    let {newPassword,oldPassword,userId} = item;
+    let data = [newPassword,updateDate,oldPassword,userId]
+    let result = await new Promise((resolve,reject)=>{
+        //向记录表中插入一条播放记录，同时更新抖音歌曲的播放次数
+        //https://www.cnblogs.com/hzj680539/p/8032270.html
+        //返回的response[0]表示执行第一条sql的结果，response[1]表示执行第一条sql的结果
+        connection.query(`
+            UPDATE user SET password = ?,update_date=? WHERE user_id=? AND password=? `,data,(error,response)=>{
+            if(error){
+                console.log("错误",error);
+                reject(error)
+            }else{
+                if(response.affectedRows == 1){
+                    resolve({
+                        ...SUCCESS,
+                        data:response,
+                        msg:"修改密码成功",
+                    });
+                }else{
+                    resolve({
+                        ...FAIL,
+                        msg:"修改密码失败，账号和密码不对",
+                        data:null
+                    })
+                }
+            }
+        });
     })
     ctx.body = result
 });

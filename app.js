@@ -12,6 +12,7 @@ const log = require("./middleware/log");
 const {createProxyMiddleware} = require('http-proxy-middleware')
 const koaConnect = require('koa2-connect')
 const setCookie = require("./middleware/setCookie");
+const filter = require("./middleware/filter");
 
 // 代理兼容封装
 const proxy = function (context, options) {
@@ -51,6 +52,7 @@ app.use(require('koa-static')(__dirname + '/public'))
 app.use(views(__dirname + '/views', {
   extension: 'pug'
 }));
+app.use(filter);
 
 const CONFIG = {
   key:"koa:sess",
@@ -70,12 +72,22 @@ app.use(async (ctx, next) => {
   let url = ctx.originalUrl
   for(let i = 0; i < allowpage.length; i++){
     if(ctx.originalUrl.indexOf(allowpage[i])!=-1){
-      if(!ctx.session.userId){//登录判断
+      // if(!ctx.session.userId){//登录判断
+      //   ctx.body = {
+      //     msg:"未登录"
+      //   }
+      //   ctx.status = 403;
+      //   return;
+      // }
+      let token = ctx.cookies.get("token");
+      if(token){
+
+      }else{
         ctx.body = {
           msg:"未登录"
         }
         ctx.status = 403;
-        return;
+        return ;
       }
     }
   }
