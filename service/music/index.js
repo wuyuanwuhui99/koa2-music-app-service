@@ -1,5 +1,4 @@
 const fs = require("fs");
-const path = require("path");
 const Router = require("koa-router");
 const axios = require("axios");
 const connection = require("../connection");
@@ -7,12 +6,24 @@ const {Base64} = require('js-base64');
 const router = new Router();
 const request = require('request');
 const jsonwebtoken = require("jsonwebtoken");
-const {SECRET,ERR_OK,SUCCESS,FAIL} = require("../../config");
+const {
+    SECRET,
+    ERR_OK,
+    SUCCESS,
+    FAIL,
+    OPARATION,
+    USER_AVATER_PATH,
+    RELATIVE_AVATER_PATH,
+    TOKEN_OPTIONS,
+    INIT_TOKEN_OPTIONS,
+    COOKIE_OPTIONS
+} = require("../../config");
 const {getFullTime,getValue} = require("../../utils/common");
 
 
 //获取推荐音乐数据,请求地地址：/service/music/getDiscList
 router.get("/getDiscList",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取推荐音乐数据",method:"getDiscList",oparation:OPARATION.SELECT}
     let options = {
         headers:{//设置请求头
             referer:'https://c.y.qq.com/',
@@ -60,6 +71,7 @@ router.get("/getDiscList",async(ctx)=>{
 
 //获取歌词数据,请求地地址：/service/music/lyric
 router.get("/getLyric",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌词数据",method:"getLyric",oparation:OPARATION.SELECT}
     const url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg';
     let {songmid} = ctx.query;
     let options ={
@@ -116,6 +128,7 @@ router.get("/getLyric",async(ctx)=>{
 
 //获取歌手列表,请求地地址：/service/music/getSingerList
 router.get("/getSingerList",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌手列表",method:"getSingerList",oparation:OPARATION.SELECT}
     let params = {
         jsonpCallback:"getSingerList",
         g_tk: 5381,
@@ -161,6 +174,7 @@ router.get("/getSingerList",async(ctx)=>{
 
 //获取热门推荐,请求地地址：/service/music/getHotKey
 router.get("/getHotKey",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取热门推荐",method:"getHotKey",oparation:OPARATION.SELECT}
     let params = {
         g_tk: 5381,
         inCharset: "utf-8",
@@ -201,6 +215,7 @@ router.get("/getHotKey",async(ctx)=>{
 
 //搜索,请求地地址：/service/music/search
 router.get("/search",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"搜索",method:"search",oparation:OPARATION.SELECT}
     let {catZhida,p,n,w} = ctx.query;
     let params = {
         g_tk: 5381,
@@ -256,6 +271,7 @@ router.get("/search",async(ctx)=>{
 
 //获取歌手的歌曲,请求地地址：/service/music/getSingerDetail
 router.get("/getSingerDetail",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌手的歌曲",method:"getSingerDetail",oparation:OPARATION.SELECT}
     let {singermid} = ctx.query;
     let params = {
         jsonpCallback:"getSingerDetail",
@@ -300,6 +316,7 @@ router.get("/getSingerDetail",async(ctx)=>{
 
 //获取推荐列表,请求地地址：/service/music/getRecommend
 router.get("/getRecommend",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取推荐列表",method:"getRecommend",oparation:OPARATION.SELECT}
     let options = {
         headers:{//设置请求头
             referer: 'https://y.qq.com/',
@@ -361,6 +378,7 @@ router.get("/getRecommend",async(ctx)=>{
 
 //获取歌单数据,请求地地址：/service/music/getSongList
 router.get("/getSongList",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌单数据",method:"getSongList",oparation:OPARATION.SELECT};
     const url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg';
     let {disstid} = ctx.query;
     await axios.get(url,{//同步请求
@@ -414,6 +432,7 @@ router.get("/getSongList",async(ctx)=>{
 
 //获取排行版数据,请求地地址：/service/music/getTopList
 router.get("/getTopList",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌单数据",method:"getTopList",oparation:OPARATION.SELECT};
     const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_myqq_toplist.fcg';
     await axios.get(url,{//同步请求
         params:{...ctx.query,jsonpCallback:"getTopList"}
@@ -434,6 +453,7 @@ router.get("/getTopList",async(ctx)=>{
 
 //获取音乐列表,请求地地址：/service/music/getMusicList
 router.get("/getMusicList",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取音乐列表",method:"getMusicList",oparation:OPARATION.SELECT};
     const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg';
     await axios.get(url,{//同步请求
         params:{...ctx.query,jsonpCallback:"getMusicList"}
@@ -454,6 +474,7 @@ router.get("/getMusicList",async(ctx)=>{
 
 //获取歌曲的url,请求地地址：/service/music/getAudioUrl
 router.get("/getAudioUrl",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌曲的url",method:"getAudioUrl",oparation:OPARATION.SELECT};//日志记录
     const url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg';
     await axios.get(url,{//同步请求
         params:{...ctx.query,jsonpCallback:"getAudioUrl"}
@@ -474,6 +495,7 @@ router.get("/getAudioUrl",async(ctx)=>{
 
 //获取歌曲的key,请求地地址：/service/music/getSingleSong
 router.get("/getSingleSong",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取歌曲的key",method:"getSingleSong",oparation:OPARATION.SELECT};//日志记录
     let {songmid} = ctx.query;
     let params =  {
         jsonpCallback:"getSingleSong",
@@ -538,6 +560,7 @@ router.get("/getSingleSong",async(ctx)=>{
 
 //登录,请求地地址：/service/music/login
 router.post("/login",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"登录",method:"login",oparation:OPARATION.LOGIN};//日志记录
     let {userId,password} = ctx.request.body;
     let result = await new Promise((resolve,reject)=>{
         if(!userId || !password){
@@ -556,23 +579,8 @@ router.post("/login",async(ctx)=>{
                 })
             }else{
                 var userData = JSON.parse(JSON.stringify(response[0]));
-                var token = jsonwebtoken.sign(
-                    userData,  // 加密userToken
-                    SECRET,
-                    { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
-                );
-                ctx.cookies.set(
-                    'token',
-                    token,    //可替换为token
-                    {
-                        // domain: 'localhost',  // 写cookie所在的域名
-                        // path: '/',       // 写cookie所在的路径
-                        // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
-                        maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
-                        httpOnly: false,  // 是否只用于http请求中获取
-                        overwrite: false  // 是否允许重写
-                    }
-                )
+                var token =  jsonwebtoken.sign(userData,SECRET, INIT_TOKEN_OPTIONS);
+                ctx.cookies.set('token', token,COOKIE_OPTIONS);
                 resolve({
                     ...SUCCESS,
                     msg:"登录成功",
@@ -586,15 +594,19 @@ router.post("/login",async(ctx)=>{
 
 //登出,请求地地址：/service/music/logout
 router.get("/logout",async(ctx)=>{
-    ctx.session.userId = "";
+    ctx.state.bodyAttribs = {description:"登录",method:"login",oparation:OPARATION.LOGOUT};//日志记录
+    ctx.cookies.set( 'token', "",{...COOKIE_OPTIONS,maxAge: 0}
+    );
     ctx.body = {
         ...SUCCESS,
         msg:"退出登录成功",
+        data:null
     }
 })
 
 //注册,请求地地址：/service/music/register
 router.post("/register",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"register",method:"login",oparation:OPARATION.INSERT};//日志记录
     let {userId,password,telephone,email} = ctx.request.body;
     ctx.session.userId = "";
     let result = await new Promise((resolve,reject)=>{
@@ -620,29 +632,15 @@ router.post("/register",async(ctx)=>{
 
 //获取用户信息,请求地地址：/service/music/getUserData
 router.get("/getUserData",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取用户信息",method:"getUserData",oparation:OPARATION.SELECT};//日志记录
     let result = await new Promise((resolve,reject)=>{
         var token = ctx.cookies.get("token");
         var userData = token ? jsonwebtoken.decode(token) : null;
         if(userData){
             connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE user_id = ?",userData.userId,(error,response)=>{
                 var userData = JSON.parse(JSON.stringify(response[0]));
-                var token = jsonwebtoken.sign(
-                    userData,  // 加密userToken
-                    SECRET,
-                    { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
-                );
-                ctx.cookies.set(
-                    'token',
-                    token,    //可替换为token
-                    {
-                        // domain: 'localhost',  // 写cookie所在的域名
-                        // path: '/',       // 写cookie所在的路径
-                        // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
-                        maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
-                        httpOnly: false,  // 是否只用于http请求中获取
-                        overwrite: false  // 是否允许重写
-                    }
-                )
+                var token =  jsonwebtoken.sign(userData,SECRET, TOKEN_OPTIONS);
+                ctx.cookies.set("token",token,COOKIE_OPTIONS);
                 resolve({
                     ...SUCCESS,
                     msg:"获取用户信息成功",
@@ -652,23 +650,8 @@ router.get("/getUserData",async(ctx)=>{
         }else{
             connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE role ='public'  order by rand() LIMIT 1",(error,response)=>{
                 let userData = JSON.parse(JSON.stringify(response[0]));
-                let token = jsonwebtoken.sign(
-                    userData ,  // 加密userToken
-                    SECRET,
-                    { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
-                );
-                ctx.cookies.set(
-                    'token',
-                    token,    //可替换为token
-                    {
-                        // domain: 'localhost',  // 写cookie所在的域名
-                        // path: '/',       // 写cookie所在的路径
-                        // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
-                        maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
-                        httpOnly: false,  // 是否只用于http请求中获取
-                        overwrite: false  // 是否允许重写
-                    }
-                );
+                let token = jsonwebtoken.sign(userData,SECRET, INIT_TOKEN_OPTIONS);
+                ctx.cookies.set("token",token,COOKIE_OPTIONS);
                 resolve({
                     ...SUCCESS,
                     msg:"获取用户信息成功",
@@ -683,6 +666,7 @@ router.get("/getUserData",async(ctx)=>{
 
 //根据用户id查询收藏的歌曲,请求地地址：/service/music/getFavorite
 router.get("/getFavorite",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"根据用户id查询收藏的歌曲",method:"getFavorite",oparation:OPARATION.SELECT};//日志记录
     let result = await new Promise((resolve,reject)=>{
         let token = ctx.cookies.get("token");
         var userData = jsonwebtoken.decode(token);
@@ -703,6 +687,7 @@ router.get("/getFavorite",async(ctx)=>{
 
 //查询歌曲收藏,请求地地址：/service/music/queryFavorite
 router.get("/queryFavorite",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"查询歌曲收藏",method:"queryFavorite",oparation:OPARATION.SELECT};//日志记录
     let {mid,userId} = ctx.query;
     let result =await new Promise((resolve,reject)=>{
         if(!mid || !userId){//没有歌曲获取用户id
@@ -741,6 +726,7 @@ router.get("/queryFavorite",async(ctx)=>{
 
 //添加收藏,请求地地址：/service/music/addFavorite
 router.post("/addFavorite",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"添加收藏",method:"addFavorite",oparation:OPARATION.INSERT};//日志记录
     let result = await new Promise((resolve,reject)=>{
         let data = [];
         let item = ctx.request.body;
@@ -816,6 +802,7 @@ router.post("/addFavorite",async(ctx)=>{
 
 //取消收藏,请求地地址：/service/music/deleteFavorite
 router.post("/deleteFavorite",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"取消收藏",method:"deleteFavorite",oparation:OPARATION.DELETE};//日志记录
     let item = ctx.request.body;
     let result = await new Promise((resolve,reject)=>{
         connection.query("DELETE FROM favorite_music WHERE id = ? AND user_id = ?",[item.id,item.userId],(error,response)=>{
@@ -845,6 +832,7 @@ router.post("/deleteFavorite",async(ctx)=>{
 
 //获取抖音歌曲列表,请求地地址：/service/music/getDouyinList
 router.get("/getDouyinList",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"获取抖音歌曲列表",method:"getDouyinList",oparation:OPARATION.SELECT};//日志记录
     let result = await new Promise((resolve,reject)=>{
         //查询数据库
         connection.query(`SELECT 
@@ -885,6 +873,7 @@ router.get("/getDouyinList",async(ctx)=>{
 
 //记录播放和抖音歌曲的播放次数,请求地地址：/service/music/record
 router.post("/record",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"记录播放和抖音歌曲的播放次数",method:"record",oparation:OPARATION.INSERT};//日志记录
     let item = ctx.request.body;
     let timer =  getFullTime();//当前时间
     let {id,albummid,duration,image,mid,name,singer,url,userId} = item
@@ -914,10 +903,32 @@ router.post("/record",async(ctx)=>{
 });
 
 //修改用户信息,请求地地址：/service/music/updateUser
-router.post("/updateUser",async(ctx)=>{
+router.put("/updateUser",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"修改用户信息",method:"updateUser",oparation:OPARATION.UPDATE};//日志记录
     let item = ctx.request.body;
     let updateDate =  getFullTime();//当前时间
     let {username,telephone,email,avater,birthday,sex,role,userId} = item;
+    if(!username){
+        ctx.body = {
+            ...FAIL,
+            msg:"用户名不能为空",
+            data:null
+        };
+    }else if(!telephone){
+        ctx.body = {
+            ...FAIL,
+            msg:"电话不能为空",
+            data:null
+        };
+        return;
+    }else if(!email){
+        ctx.body = {
+            ...FAIL,
+            msg:"邮箱不能为空",
+            data:null
+        };
+        return;
+    }
     let data = [updateDate,username,telephone,email,avater,birthday,sex,role,userId]
     let result = await new Promise((resolve,reject)=>{
         //向记录表中插入一条播放记录，同时更新抖音歌曲的播放次数
@@ -931,25 +942,14 @@ router.post("/updateUser",async(ctx)=>{
                 }else{
                     if(response.affectedRows == 1){
                         let token = jsonwebtoken.sign(
-                            userData ,  // 加密userToken
                             {username,telephone,email,avater,birthday,sex,role,userId},
-                            { expiresIn:  60 * 60 * 24 * 30,algorithm: 'HS256'}
+                            SECRET,
+                            TOKEN_OPTIONS
                         );
-                        ctx.cookies.set(
-                            'token',
-                            token,    //可替换为token
-                            {
-                                // domain: 'localhost',  // 写cookie所在的域名
-                                // path: '/',       // 写cookie所在的路径
-                                // expires: new Date(startDate.getTime()+  1000 * 60 * 60 * 24 * 365),  // cookie失效时间
-                                maxAge: 1000 * 60 * 60 * 24 * 365, // cookie有效时长
-                                httpOnly: false,  // 是否只用于http请求中获取
-                                overwrite: false  // 是否允许重写
-                            }
-                        );
+                        ctx.cookies.set("token",token,COOKIE_OPTIONS);
                         resolve({
                             ...SUCCESS,
-                            data:response,
+                            data:{username,telephone,email,avater,birthday,sex,role,userId},
                             msg:"修改账号信息成功",
                         });
                     }else{
@@ -966,7 +966,8 @@ router.post("/updateUser",async(ctx)=>{
 });
 
 //修改密码,请求地地址：/service/music/updatePassword
-router.post("/updatePassword",async(ctx)=>{
+router.put("/updatePassword",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"修改密码",method:"updatePassword",oparation:OPARATION.UPDATE};//日志记录
     let item = ctx.request.body;
     let updateDate =  getFullTime();//当前时间
     let {newPassword,oldPassword,userId} = item;
@@ -994,6 +995,54 @@ router.post("/updatePassword",async(ctx)=>{
                         data:null
                     })
                 }
+            }
+        });
+    })
+    ctx.body = result
+});
+
+//修改密码,请求地地址：/service/music/update/用户id
+router.post("/upload",async(ctx)=>{
+    ctx.state.bodyAttribs = {description:"文件上传",method:"upload",oparation:OPARATION.UPLOAD};//日志记录
+    let file = ctx.request.files.img;
+    let token = ctx.cookies.get("token");
+    let userData = jsonwebtoken.decode(token);
+    if(!userData.userId){
+        return  ctx.body = {
+            ...FAIL,
+            data:null,
+            msg:"token无效",
+        };
+    }
+    userData = {...userData};
+    let updateDate =  getFullTime();//当前时间
+    // 创建可读流
+    const reader = fs.createReadStream(file.path);
+    let ext = file.name.slice(file.name.lastIndexOf(".")+1);//获取文件后缀
+    // 创建可写流
+    let filename =  `${userData.userId}_${new Date().getTime()}.${ext}`;
+    const upStream = fs.createWriteStream(USER_AVATER_PATH + filename);
+    let avater = RELATIVE_AVATER_PATH +  filename;
+    // 可读流通过管道写入可写流
+    reader.pipe(upStream);
+    let result = await new Promise((resolve,reject)=>{
+        //向记录表中插入一条播放记录，同时更新抖音歌曲的播放次数
+        //https://www.cnblogs.com/hzj680539/p/8032270.html
+        //返回的response[0]表示执行第一条sql的结果，response[1]表示执行第一条sql的结果
+        connection.query(`
+            UPDATE user SET avater = ?, update_date = ? WHERE user_id = ?`,[avater,updateDate,userData.userId],(error,response)=>{
+            if(error){
+                console.log("错误",error);
+                reject(error)
+            }else{
+                userData.avater = avater;
+                let token = jsonwebtoken.sign(userData,SECRET, TOKEN_OPTIONS);
+                ctx.cookies.set("token",token,COOKIE_OPTIONS)
+                resolve({
+                    ...SUCCESS,
+                    data:userData,
+                    msg:"修改头像成功",
+                });
             }
         });
     })

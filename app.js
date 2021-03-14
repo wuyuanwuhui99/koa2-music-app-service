@@ -13,6 +13,7 @@ const {createProxyMiddleware} = require('http-proxy-middleware')
 const koaConnect = require('koa2-connect')
 const setCookie = require("./middleware/setCookie");
 const filter = require("./middleware/filter");
+const koaBody = require('koa-body');
 
 // 代理兼容封装
 const proxy = function (context, options) {
@@ -41,6 +42,12 @@ Object.keys(proxyTable).map(context => {
 })
 
 onerror(app)
+app.use(koaBody({
+  multipart: true,
+  formidable: {
+    maxFileSize: 200*1024*1024    // 设置上传文件大小最大限制，默认2M
+  }
+}));
 app.use(log);//日志记录
 app.use(setCookie);//设置cookie
 app.use(bodyparser({

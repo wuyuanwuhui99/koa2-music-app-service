@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="77feeb0a-a3bd-40e2-afc1-5b68e5e9d53d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/middleware/filter.js" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/filter.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middleware/log.js" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/log.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/middleware/setCookie.js" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/setCookie.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/music/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/service/music/index.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -18,8 +25,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/service/music/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="137">
-              <caret line="39" column="40" lean-forward="true" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="40" />
+            <state relative-caret-position="3449">
+              <caret line="1025" column="19" lean-forward="true" selection-start-line="1025" selection-start-column="19" selection-end-line="1025" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -27,7 +34,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/common.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="625">
+            <state relative-caret-position="288">
               <caret line="25" column="47" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="47" />
             </state>
           </provider>
@@ -36,17 +43,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="100">
-              <caret line="4" column="11" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="11" />
+            <state relative-caret-position="54">
+              <caret line="19" column="17" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/middleware/setCookie.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="3" column="39" selection-start-line="3" selection-start-column="39" selection-end-line="3" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/middleware/log.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="50">
-              <caret line="2" selection-start-line="2" selection-end-line="2" selection-end-column="45" />
+            <state relative-caret-position="225">
+              <caret line="27" column="46" selection-start-line="27" selection-start-column="46" selection-end-line="27" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -54,28 +70,24 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="54" column="16" lean-forward="true" selection-start-line="54" selection-start-column="16" selection-end-line="54" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/middleware/filter.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="275">
-              <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+            <state relative-caret-position="140">
+              <caret line="16" selection-start-line="16" selection-end-line="16" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/cookies/index.js">
+        <entry file="file://$PROJECT_DIR$/middleware/filter.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2550">
-              <caret line="107" column="14" selection-start-line="107" selection-start-column="14" selection-end-line="107" selection-end-column="14" />
+            <state relative-caret-position="125">
+              <caret line="5" column="111" selection-start-line="5" selection-start-column="111" selection-end-line="5" selection-end-column="111" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/music1_MarkMan.png">
+          <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -91,7 +103,7 @@
         <entry file="file://$PROJECT_DIR$/service/index.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="300">
-              <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
             </state>
           </provider>
         </entry>
@@ -107,18 +119,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>koaConnect</find>
-      <find>koa2-connect</find>
-      <find>httpProxyMiddleware</find>
-      <find>keys</find>
-      <find>getUserData</find>
-      <find>jsonwebtoken</find>
-      <find>jsonwebtoken.sign</find>
-      <find>expiresIn</find>
-      <find>getTopList</find>
-      <find>getSingerDetail</find>
-      <find>lyric</find>
-      <find>AS userId</find>
       <find>getDiscList</find>
       <find>getRecommend</find>
       <find>GETr</find>
@@ -132,11 +132,23 @@
       <find>success</find>
       <find>getFa</find>
       <find>fs</find>
-      <find>path</find>
-      <find>login</find>
       <find>getFullTime</find>
-      <find>jsonwebtoken.sign</find>
       <find>ctx.resp</find>
+      <find>getUs</find>
+      <find>ctx.state.bodyAttribs</find>
+      <find>oparation</find>
+      <find>koa-body</find>
+      <find>login</find>
+      <find>bodyparser</find>
+      <find>logout</find>
+      <find>json</find>
+      <find>ctx.cookies.set</find>
+      <find>AVATER_PATH</find>
+      <find>ctx.cookies.set</find>
+      <find>path</find>
+      <find>jsonwebtoken.sign</find>
+      <find>jsonwebtoken.sign</find>
+      <find>TOKEN_OPTIONS</find>
     </findStrings>
     <replaceStrings>
       <replace>...fail</replace>
@@ -160,6 +172,7 @@
       <replace>kugouUrl</replace>
       <replace>SUCCESS</replace>
       <replace>FAIL</replace>
+      <replace>TOKEN_OPTIONS</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -191,15 +204,15 @@
         <option value="$PROJECT_DIR$/service/connection.js" />
         <option value="$PROJECT_DIR$/middle/log.js" />
         <option value="$PROJECT_DIR$/package.json" />
-        <option value="$PROJECT_DIR$/middleware/log.js" />
         <option value="$PROJECT_DIR$/service/index.js" />
-        <option value="$PROJECT_DIR$/middleware/setCookie.js" />
         <option value="$PROJECT_DIR$/utils/index.js" />
         <option value="$PROJECT_DIR$/utils/common.js" />
+        <option value="$PROJECT_DIR$/middleware/setCookie.js" />
+        <option value="$PROJECT_DIR$/middleware/log.js" />
+        <option value="$PROJECT_DIR$/middleware/filter.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/config/index.js" />
         <option value="$PROJECT_DIR$/service/music/index.js" />
-        <option value="$PROJECT_DIR$/middleware/filter.js" />
       </list>
     </option>
   </component>
@@ -231,17 +244,6 @@
               <item name="music" type="b2602c69:ProjectViewProjectNode" />
               <item name="music" type="462c0819:PsiDirectoryNode" />
               <item name="middleware" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="music" type="b2602c69:ProjectViewProjectNode" />
-              <item name="music" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="music" type="b2602c69:ProjectViewProjectNode" />
-              <item name="music" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-              <item name="music" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -375,18 +377,18 @@
       <workItem from="1615523242965" duration="762000" />
       <workItem from="1615561644404" duration="5559000" />
       <workItem from="1615598733332" duration="12946000" />
-      <workItem from="1615615328496" duration="4874000" />
+      <workItem from="1615615328496" duration="17496000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="274274000" />
+    <option name="totallyTimeSpent" value="286896000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13690476" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13690476" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -395,8 +397,8 @@
       <window_info id="Job Explorer" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32786885" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.19016394" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.5163934" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.35409835" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.24262296" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -425,19 +427,25 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/music/index.js</url>
-          <line>48</line>
+          <line>59</line>
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/music/index.js</url>
-          <line>357</line>
+          <line>374</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/service/music/index.js</url>
-          <line>558</line>
+          <line>581</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/service/music/index.js</url>
+          <line>1038</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -528,47 +536,47 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>res.cdlist[0]</expression-string>
+        <expression-string>jsonwebtoken.sign(userData,SECRET, {algorithm: 'HS256'});</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>res.cdlist</expression-string>
+        <expression-string>jsonwebtoken.sign(userData,SECRET, TOKEN_OPTIONS);</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus.data.shelf.v_niche[0].v_card</expression-string>
+        <expression-string>jsonwebtoken.sign(userData,SECRET, TOKEN_OPTIONS)</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus.data.shelf.v_niche[0]</expression-string>
+        <expression-string>file.name.slice(file.name.lastIndexOf(&quot;.&quot;)+1)</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus.data.shelf.v_niche</expression-string>
+        <expression-string>file.name</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus.data.shelf.v_card</expression-string>
+        <expression-string>USER_AVATER_PATH + file.name</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus.data.shelf</expression-string>
+        <expression-string>ctx.request.body</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus.data</expression-string>
+        <expression-string>ctx.request</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>response.data.focus</expression-string>
+        <expression-string>ctx.request.files</expression-string>
         <language-id>JavaScript</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -656,32 +664,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="675">
-          <caret line="27" column="27" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/users.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/middleware/setCookie.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="12" selection-start-line="12" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/download.js" />
     <entry file="file://$PROJECT_DIR$/utils/index.js" />
-    <entry file="file://$PROJECT_DIR$/utils/common.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
-          <caret line="25" column="47" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/koa/lib/response.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="10925">
@@ -699,21 +686,7 @@
     <entry file="file://$PROJECT_DIR$/service/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="54" column="16" lean-forward="true" selection-start-line="54" selection-start-column="16" selection-end-line="54" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/middleware/log.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="50">
-          <caret line="2" selection-start-line="2" selection-end-line="2" selection-end-column="45" />
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
         </state>
       </provider>
     </entry>
@@ -724,24 +697,62 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/index.js">
+    <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="4" column="11" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="11" />
+        <state relative-caret-position="143">
+          <caret line="21" column="32" selection-start-line="21" selection-start-column="32" selection-end-line="21" selection-end-column="32" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/service/music/index.js">
+    <entry file="file://$PROJECT_DIR$/utils/common.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="39" column="40" lean-forward="true" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="40" />
+        <state relative-caret-position="288">
+          <caret line="25" column="47" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/middleware/filter.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+        <state relative-caret-position="125">
+          <caret line="5" column="111" selection-start-line="5" selection-start-column="111" selection-end-line="5" selection-end-column="111" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/music1_MarkMan.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/service/music/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3449">
+          <caret line="1025" column="19" lean-forward="true" selection-start-line="1025" selection-start-column="19" selection-end-line="1025" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="19" column="17" selection-start-line="19" selection-start-column="4" selection-end-line="19" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/middleware/setCookie.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="3" column="39" selection-start-line="3" selection-start-column="39" selection-end-line="3" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/middleware/log.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="27" column="46" selection-start-line="27" selection-start-column="46" selection-end-line="27" selection-end-column="46" />
         </state>
       </provider>
     </entry>

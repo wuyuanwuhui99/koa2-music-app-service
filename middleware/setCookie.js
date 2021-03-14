@@ -2,7 +2,7 @@ const {SECRET} = require("../config");
 const jsonwebtoken = require("jsonwebtoken");
 
 module.exports =  async (ctx,next) => {
-    if(ctx.originalUrl.includes("/service/music/") && !ctx.originalUrl.includes("/service/music/getUserData")){
+    if(ctx.originalUrl.includes("/service/music/") && !ctx.originalUrl.includes("/getUserData") &&  !ctx.originalUrl.includes("/logout")){
         await next();
         var token = ctx.cookies.get("token");
         if(token){
