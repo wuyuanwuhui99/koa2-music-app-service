@@ -739,8 +739,8 @@ router.post("/addFavorite",async(ctx)=>{
         //往收藏表中插入一条数据，要管理员才能插入都抖音歌曲表
         connection.query(
             `INSERT INTO favorite_music(id,albummid,duration,image,local_image,mid,name,singer,url,user_id,create_time,lyric,local_url,play_mode,update_time,kugou_url) 
-                SELECT ? FROM DUAL WHERE NOT EXISTS (SELECT id,name FROM favorite_music WHERE id=? AND user_id= ?);
-        `,[data,id,id,userId],(error,response)=>{
+                SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE NOT EXISTS (SELECT id,name FROM favorite_music WHERE id=? AND user_id= ?);
+        `,[...data,id,userId],(error,response)=>{
                 //要管理员才能插入都抖音歌曲表
                 if(!error){
                     if(response.affectedRows == 1){//response[0]表示第一条sql执行的结果
