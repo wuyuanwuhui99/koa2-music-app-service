@@ -29,7 +29,6 @@ module.exports =  async (ctx,next) => {
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [method,url,headers,ip,params,result,startTime,runTime,description,endTime,oparation,type,userId,APPID,APPNAME],
             (err,response)=>{
-                console.log(err,response)
         })
     }else {
         await next();

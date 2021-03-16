@@ -19,7 +19,9 @@ const {
     COOKIE_OPTIONS
 } = require("../../config");
 const {getFullTime,getValue} = require("../../utils/common");
-
+// const Redis = require("koa-redis");
+// const Store = new Redis().client;
+const redisClient = require("../redisConnect");
 
 //获取推荐音乐数据,请求地地址：/service/music/getDiscList
 router.get("/getDiscList",async(ctx)=>{
@@ -216,6 +218,10 @@ router.get("/getHotKey",async(ctx)=>{
 //搜索,请求地地址：/service/music/search
 router.get("/search",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"搜索",method:"search",oparation:OPARATION.SELECT}
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let {catZhida,p,n,w} = ctx.query;
     let params = {
         g_tk: 5381,
@@ -244,29 +250,29 @@ router.get("/search",async(ctx)=>{
         w
     }
     const url = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp';
-    await axios.get(url,{
-        params
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        let res =  response.data;
-        if (typeof res === 'string') {
-            var matches = res.trim().replace(/^search\(/,"").replace(/\)$/,"");
-            res=JSON.parse(matches)
-        }
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"搜索成功",
-                data:res.data//请求结果,
-            };
-        }else {
-            ctx.body = {
-                ...FAIL,
-                msg:"搜索成功",
-                data:res.data//请求结果,
-            };
-        }
-    })
+    let response = await axios.get(url,{params});
+    ctx.response.status = 200;//写入状态
+    let res =  response.data;
+    if (typeof res === 'string') {
+        var matches = res.trim().replace(/^search\(/,"").replace(/\)$/,"");
+        res=JSON.parse(matches)
+    }
+    let result = null;
+    if(res.code == ERR_OK){
+        result = {
+            ...SUCCESS,
+            msg:"搜索成功",
+            data:res.data//请求结果,
+        };
+    }else {
+        result = {
+            ...FAIL,
+            msg:"搜索成功",
+            data:res.data//请求结果,
+        };
+    }
+    ctx.body = result;
+    redisClient.set(ctx.req.url,result);
 });
 
 //获取歌手的歌曲,请求地地址：/service/music/getSingerDetail
@@ -543,7 +549,6 @@ router.get("/getSingleSong",async(ctx)=>{
     await axios.get(url,{//同步请求
         params
     }).then((response)=>{
-    	console.log(response)
         ctx.response.status = 200;//写入状态
         var res = response.data
         if (typeof res === 'string') {
@@ -759,7 +764,6 @@ router.post("/addFavorite",async(ctx)=>{
                     //如果是管理员账号，收藏之后添加到抖音歌曲表
                     connection.query(`INSERT INTO douyin(id,albummid,duration,image,local_image,mid,name,singer,url,create_time,update_time,lyric) SELECT ?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE exists(SELECT role FROM user WHERE user_id=? AND role = 'admin') AND NOT EXISTS (SELECT albummid FROM douyin WHERE albummid=?)`,[...params],(error,response)=>{
                         if(!response)return;
-                        console.log("response=",response,url,image)
                         if(url){//把歌曲下载到本地
                             let audioMatch = url.replace(/\?.+/,"").split(".");
                             let audioFilename =  name+"."+audioMatch[audioMatch.length-1];
@@ -833,6 +837,10 @@ router.post("/deleteFavorite",async(ctx)=>{
 //获取抖音歌曲列表,请求地地址：/service/music/getDouyinList
 router.get("/getDouyinList",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取抖音歌曲列表",method:"getDouyinList",oparation:OPARATION.SELECT};//日志记录
+    let data = await redisClient.get("getDouyinList");
+    if(data){
+        return ctx.body = data;
+    }
     let result = await new Promise((resolve,reject)=>{
         //查询数据库
         connection.query(`SELECT 
@@ -869,6 +877,7 @@ router.get("/getDouyinList",async(ctx)=>{
         })
     });
     ctx.body = result;
+    redisClient.set("getDouyinList",result);
 })
 
 //记录播放和抖音歌曲的播放次数,请求地地址：/service/music/record
