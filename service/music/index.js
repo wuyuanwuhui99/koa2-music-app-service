@@ -19,13 +19,15 @@ const {
     COOKIE_OPTIONS
 } = require("../../config");
 const {getFullTime,getValue} = require("../../utils/common");
-// const Redis = require("koa-redis");
-// const Store = new Redis().client;
 const redisClient = require("../redisConnect");
 
 //获取推荐音乐数据,请求地地址：/service/music/getDiscList
 router.get("/getDiscList",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"获取推荐音乐数据",method:"getDiscList",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"获取推荐音乐数据",method:"getDiscList",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let options = {
         headers:{//设置请求头
             referer:'https://c.y.qq.com/',
@@ -49,31 +51,32 @@ router.get("/getDiscList",async(ctx)=>{
         }
     }
     const url = "https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg";
-    await axios.get(url,options).then((response)=>{
-        ctx.response.status = 200;//返回状态
-        var res = response.data;//请求结果
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"",
-                data:res.data//请求结果,
-            };
-        }else {
-            ctx.body = {
-                ...FAIL,
-                msg:res.message,
-                data:res.data//请求结果,
-            };
-        }
-
-    }).catch((e)=>{
-        console.log(e);
-    })
+    let response = await axios.get(url,options);
+    ctx.response.status = 200;//返回状态
+    var res = response.data;//请求结果
+    if(res.code == ERR_OK){
+        ctx.body = {
+            ...SUCCESS,
+            msg:"",
+            data:res.data//请求结果,
+        };
+    }else {
+        ctx.body = {
+            ...FAIL,
+            msg:res.message,
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url, ctx.body);
 });
 
 //获取歌词数据,请求地地址：/service/music/lyric
 router.get("/getLyric",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"获取歌词数据",method:"getLyric",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"获取歌词数据",method:"getLyric",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     const url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg';
     let {songmid} = ctx.query;
     let options ={
@@ -96,41 +99,43 @@ router.get("/getLyric",async(ctx)=>{
             pcachetime: + new Date(),
         }
     }
-    await axios.get(url,options).then((response)=>{
-        ctx.response.status = 200;//返回状态
-        var res = response.data;//请求结果
-        if (typeof res === 'string') {
-            var reg = /^\w+\(({[^()]+})\)$/
-            var matches = res.match(reg)
-            if (matches) {
-                res = JSON.parse(matches[1])
-            }
+    let response = await axios.get(url,options);
+    ctx.response.status = 200;//返回状态
+    var res = response.data;//请求结果
+    if (typeof res === 'string') {
+        var reg = /^\w+\(({[^()]+})\)$/
+        var matches = res.match(reg)
+        if (matches) {
+            res = JSON.parse(matches[1])
         }
-        //把歌词保存到数据库
-        connection.query("UPDATE douyin SET lyric=? WHERE mid=? AND lyric IS NULL",[encodeURIComponent(Base64.decode(res.lyric)),ctx.query.songmid],(error,response)=>{
-            console.log(response)
-        });
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"获取歌词成功",
-                data:{lyric:res.lyric}//请求结果,
-            };
-        }else{
-            ctx.body = {
-                ...false,
-                msg:res.message,
-                data:null//请求结果,
-            };
-        }
-    }).catch((e)=>{
-        console.log(e);
-    })
+    }
+    //把歌词保存到数据库
+    connection.query("UPDATE douyin SET lyric=? WHERE mid=? AND lyric IS NULL",[encodeURIComponent(Base64.decode(res.lyric)),ctx.query.songmid],(error,response)=>{
+        console.log(response)
+    });
+    if(res.code == ERR_OK){
+        ctx.body = {
+            ...SUCCESS,
+            msg:"获取歌词成功",
+            data:{lyric:res.lyric}//请求结果,
+        };
+    }else{
+        ctx.body = {
+            ...false,
+            msg:res.message,
+            data:null//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url, ctx.body);
 });
 
 //获取歌手列表,请求地地址：/service/music/getSingerList
 router.get("/getSingerList",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"获取歌手列表",method:"getSingerList",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"获取歌手列表",method:"getSingerList",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let params = {
         jsonpCallback:"getSingerList",
         g_tk: 5381,
@@ -148,35 +153,36 @@ router.get("/getSingerList",async(ctx)=>{
         platform: "yqq"
     }
     const url = `https://c.y.qq.com/v8/fcg-bin/v8.fcg`
-    await axios.get(url,{params}).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        let res =  response.data;
-        if (typeof res === 'string') {
-            var matches = res.trim().replace(/^getSingerList\(/,"").replace(/\)$/,"");
-            res=JSON.parse(matches)
-        }
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"获取歌手列表成功",
-                data:res.data.list//请求结果,
-            };
-        }else {
-            ctx.body = {
-                ...FAIL,
-                msg:res.message,
-                data:res.data//请求结果,
-            };
-        }
-
-    }).catch((err)=>{
-        console.log(err)
-    })
+    let response = await axios.get(url,{params});
+    ctx.response.status = 200;//写入状态
+    let res =  response.data;
+    if (typeof res === 'string') {
+        var matches = res.trim().replace(/^getSingerList\(/,"").replace(/\)$/,"");
+        res=JSON.parse(matches)
+    }
+    if(res.code == ERR_OK){
+        ctx.body = {
+            ...SUCCESS,
+            msg:"获取歌手列表成功",
+            data:res.data.list//请求结果,
+        };
+    }else {
+        ctx.body = {
+            ...FAIL,
+            msg:res.message,
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url, ctx.body);
 });
 
 //获取热门推荐,请求地地址：/service/music/getHotKey
 router.get("/getHotKey",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"获取热门推荐",method:"getHotKey",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"获取热门推荐",method:"getHotKey",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let params = {
         g_tk: 5381,
         inCharset: "utf-8",
@@ -189,35 +195,32 @@ router.get("/getHotKey",async(ctx)=>{
         jsonpCallback:"getHotKey"
     }
     const url = "https://c.y.qq.com/splcloud/fcgi-bin/gethotkey.fcg";
-    await axios.get(url,{
-        params
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        let res =  response.data;
-        if (typeof res === 'string') {
-            var matches = res.trim().replace(/^getHotKey\(/,"").replace(/\)$/,"");
-            res=JSON.parse(matches)
-        }
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"获取热门推荐成功",
-                data:res.data//请求结果,
-            };
-        }else{
-            ctx.body = {
-                ...FAIL,
-                msg:"获取热门推荐失败",
-                data:res.data//请求结果,
-            };
-        }
-
-    })
+    let response = await axios.get(url,{params});
+    ctx.response.status = 200;//写入状态
+    let res =  response.data;
+    if (typeof res === 'string') {
+        var matches = res.trim().replace(/^getHotKey\(/,"").replace(/\)$/,"");
+        res=JSON.parse(matches)
+    }
+    if(res.code == ERR_OK){
+        ctx.body = {
+            ...SUCCESS,
+            msg:"获取热门推荐成功",
+            data:res.data//请求结果,
+        };
+    }else{
+        ctx.body = {
+            ...FAIL,
+            msg:"获取热门推荐失败",
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url, ctx.body);
 });
 
 //搜索,请求地地址：/service/music/search
 router.get("/search",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"搜索",method:"search",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"搜索",method:"search",oparation:OPARATION.SELECT};
     let data = await redisClient.get(ctx.req.url);
     if(data){
         return ctx.body = data;
@@ -257,27 +260,29 @@ router.get("/search",async(ctx)=>{
         var matches = res.trim().replace(/^search\(/,"").replace(/\)$/,"");
         res=JSON.parse(matches)
     }
-    let result = null;
     if(res.code == ERR_OK){
-        result = {
+        ctx.body = {
             ...SUCCESS,
             msg:"搜索成功",
             data:res.data//请求结果,
         };
     }else {
-        result = {
+        ctx.body = {
             ...FAIL,
             msg:"搜索成功",
             data:res.data//请求结果,
         };
     }
-    ctx.body = result;
-    redisClient.set(ctx.req.url,result);
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //获取歌手的歌曲,请求地地址：/service/music/getSingerDetail
 router.get("/getSingerDetail",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"获取歌手的歌曲",method:"getSingerDetail",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"获取歌手的歌曲",method:"getSingerDetail",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let {singermid} = ctx.query;
     let params = {
         jsonpCallback:"getSingerDetail",
@@ -296,33 +301,36 @@ router.get("/getSingerDetail",async(ctx)=>{
         singermid
     }
     const url = `https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg`;
-    await axios.get(url,{params}).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        let res =  response.data;
-        if (typeof res === 'string') {
-            var matches = res.trim().replace(/^getSingerDetail\(/,"").replace(/\)$/,"");
-            res=JSON.parse(matches)
-        }
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"获取歌手歌曲成功",
-                data:res.data//请求结果,
-            };
-        }else{
-            ctx.body = {
-                ...FAIL,
-                msg:res.message,
-                data:res.data//请求结果,
-            };
-        }
-
-    });
+    let response = await axios.get(url,{params});
+    ctx.response.status = 200;//写入状态
+    let res =  response.data;
+    if (typeof res === 'string') {
+        var matches = res.trim().replace(/^getSingerDetail\(/,"").replace(/\)$/,"");
+        res=JSON.parse(matches)
+    }
+    if(res.code == ERR_OK){
+        ctx.body = {
+            ...SUCCESS,
+            msg:"获取歌手歌曲成功",
+            data:res.data//请求结果,
+        };
+    }else{
+        ctx.body = {
+            ...FAIL,
+            msg:res.message,
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //获取推荐列表,请求地地址：/service/music/getRecommend
 router.get("/getRecommend",async(ctx)=>{
-    ctx.state.bodyAttribs = {description:"获取推荐列表",method:"getRecommend",oparation:OPARATION.SELECT}
+    ctx.state.bodyAttribs = {description:"获取推荐列表",method:"getRecommend",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let options = {
         headers:{//设置请求头
             referer: 'https://y.qq.com/',
@@ -368,26 +376,27 @@ router.get("/getRecommend",async(ctx)=>{
 
     }
     const url = 'https://u.y.qq.com/cgi-bin/musics.fcg';
-    // const url = "https://u.y.qq.com/cgi-bin/musics.fcg?-=recom15635130779109763&g_tk=5381&sign=zzavgi6x8os5ocff15c4441255ee9ef959d8dacccc3f88&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&data=%7B%22comm%22%3A%7B%22ct%22%3A24%7D%2C%22category%22%3A%7B%22method%22%3A%22get_hot_category%22%2C%22param%22%3A%7B%22qq%22%3A%22%22%7D%2C%22module%22%3A%22music.web_category_svr%22%7D%2C%22recomPlaylist%22%3A%7B%22method%22%3A%22get_hot_recommend%22%2C%22param%22%3A%7B%22async%22%3A1%2C%22cmd%22%3A2%7D%2C%22module%22%3A%22playlist.HotRecommendServer%22%7D%2C%22playlist%22%3A%7B%22method%22%3A%22get_playlist_by_category%22%2C%22param%22%3A%7B%22id%22%3A8%2C%22curPage%22%3A1%2C%22size%22%3A40%2C%22order%22%3A5%2C%22titleid%22%3A8%7D%2C%22module%22%3A%22playlist.PlayListPlazaServer%22%7D%2C%22new_song%22%3A%7B%22module%22%3A%22newsong.NewSongServer%22%2C%22method%22%3A%22get_new_song_info%22%2C%22param%22%3A%7B%22type%22%3A5%7D%7D%2C%22new_album%22%3A%7B%22module%22%3A%22newalbum.NewAlbumServer%22%2C%22method%22%3A%22get_new_album_info%22%2C%22param%22%3A%7B%22area%22%3A1%2C%22sin%22%3A0%2C%22num%22%3A20%7D%7D%2C%22new_album_tag%22%3A%7B%22module%22%3A%22newalbum.NewAlbumServer%22%2C%22method%22%3A%22get_new_album_area%22%2C%22param%22%3A%7B%7D%7D%2C%22toplist%22%3A%7B%22module%22%3A%22musicToplist.ToplistInfoServer%22%2C%22method%22%3A%22GetAll%22%2C%22param%22%3A%7B%7D%7D%2C%22focus%22%3A%7B%22module%22%3A%22music.musicHall.MusicHallPlatform%22%2C%22method%22%3A%22GetFocus%22%2C%22param%22%3A%7B%7D%7D%7D"
-    await axios.get(url,options).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        let list = getValue(response,["data","focus","data","shelf","v_niche","0","v_card"],[]);
-        ctx.body = {
-            ...SUCCESS,
-            msg:"获取推荐列表成功",
-            data:list//请求结果,
-        };
-    }).catch((err)=>{
-        console.log(err)
-    })
+    let response = await axios.get(url,options);
+    ctx.response.status = 200;//写入状态
+    let list = getValue(response,["data","focus","data","shelf","v_niche","0","v_card"],[]);
+    ctx.body = {
+        ...SUCCESS,
+        msg:"获取推荐列表成功",
+        data:list//请求结果,
+    };
+    redisClient.set(ctx.req.url,ctx.body);
 })
 
 //获取歌单数据,请求地地址：/service/music/getSongList
 router.get("/getSongList",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取歌单数据",method:"getSongList",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     const url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg';
     let {disstid} = ctx.query;
-    await axios.get(url,{//同步请求
+    let response = await axios.get(url,{//同步请求
         headers: {//设置请求头
             referer: 'https://y.qq.com/n/yqq/playlist/4151357153.html',
             host: 'c.y.qq.com',
@@ -410,98 +419,166 @@ router.get("/getSongList",async(ctx)=>{
             needNewCode: 0,
             jsonpCallback:"playlistinfoCallback"
         }
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        var res = response.data
-        if (typeof res === 'string') {
-            var matches = res.replace(/^playlistinfoCallback\(/,"").replace(/\)$/,"")
-            res=JSON.parse(matches)
-        }
-        if(res.code == ERR_OK){
-            ctx.body = {
-                ...SUCCESS,
-                msg:"获取歌单数据成功",
-                data:res.cdlist ? res.cdlist[0] :{}//请求结果,
-            };
-        }else{
-            ctx.body = {
-                ...FAIL,
-                msg:res.message,
-                data:res.data//请求结果,
-            };
-        }
-
-    }).catch((e)=>{
-        console.log(e);
-    })
+    });
+    ctx.response.status = 200;//写入状态
+    var res = response.data
+    if (typeof res === 'string') {
+        var matches = res.replace(/^playlistinfoCallback\(/,"").replace(/\)$/,"")
+        res=JSON.parse(matches)
+    }
+    if(res.code == ERR_OK){
+        ctx.body = {
+            ...SUCCESS,
+            msg:"获取歌单数据成功",
+            data:res.cdlist ? res.cdlist[0] :{}//请求结果,
+        };
+    }else{
+        ctx.body = {
+            ...FAIL,
+            msg:res.message,
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //获取排行版数据,请求地地址：/service/music/getTopList
 router.get("/getTopList",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取歌单数据",method:"getTopList",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
+    let params = {
+        g_tk: 5381,
+        inCharset: 'utf-8',
+        outCharset: 'utf-8',
+        notice: 0,
+        format: 'jsonp',
+        uin: 0,
+        needNewCode: 1,
+        platform: 'h5',
+        jsonpCallback:"getTopList"
+    }
     const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_myqq_toplist.fcg';
-    await axios.get(url,{//同步请求
-        params:{...ctx.query,jsonpCallback:"getTopList"}
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        var res = response.data
-        if (typeof res === 'string') {
-            var matches = res.replace(/^getTopList\(/,"").replace(/\)$/,"")
-            res=JSON.parse(matches)
-        }
+    let response = await axios.get(url,{ params });
+    ctx.response.status = 200;//写入状态
+    var res = response.data
+    if (typeof res === 'string') {
+        var matches = res.replace(/^getTopList\(/,"").replace(/\)$/,"")
+        res=JSON.parse(matches)
+    }
+    if(res.code == ERR_OK){
         ctx.body = {
             ...SUCCESS,
             msg:"获取排行版数据成功",
-            data:res//请求结果,
+            data:res.data//请求结果,
         };
-    });
+    }else{
+        ctx.body = {
+            ...FAIL,
+            msg:res.message,
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //获取音乐列表,请求地地址：/service/music/getMusicList
 router.get("/getMusicList",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取音乐列表",method:"getMusicList",oparation:OPARATION.SELECT};
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
+    let {topid} = ctx.query;
+    let params = {
+        needNewCode: 1,
+        uin: 0,
+        tpl: 3,
+        page: 'detail',
+        type: 'top',
+        platform: 'h5',
+        g_tk: 5381,
+        inCharset: 'utf-8',
+        outCharset: 'utf-8',
+        notice: 0,
+        format: 'jsonp',
+        jsonpCallback:"getMusicList",
+        topid
+    }
     const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg';
-    await axios.get(url,{//同步请求
-        params:{...ctx.query,jsonpCallback:"getMusicList"}
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        var res = response.data
-        if (typeof res === 'string') {
-            var matches = res.replace(/^getMusicList\(/,"").replace(/\)$/,"")
-            res=JSON.parse(matches)
-        }
+    let response = await axios.get(url,{params});
+    ctx.response.status = 200;//写入状态
+    var res = response.data
+    if (typeof res === 'string') {
+        var matches = res.replace(/^getMusicList\(/,"").replace(/\)$/,"")
+        res=JSON.parse(matches)
+    }
+    if(res.code == ERR_OK){
         ctx.body = {
             ...SUCCESS,
             msg:"获取音乐列表成功",
-            data:res//请求结果,
+            data:res.data//请求结果,
         };
-    });
+    }else{
+        ctx.body = {
+            ...FAIL,
+            msg:res.message,
+            data:res.data//请求结果,
+        };
+    }
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //获取歌曲的url,请求地地址：/service/music/getAudioUrl
 router.get("/getAudioUrl",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取歌曲的url",method:"getAudioUrl",oparation:OPARATION.SELECT};//日志记录
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
+    let {songmid,filename} = ctx.query;
+    let params = {
+        inCharset: 'utf-8',
+        outCharset: 'utf-8',
+        format: 'jsonp',
+        g_tk:5381,
+        loginUin:0,
+        hostUin:0,
+        notice:0,
+        platform:"yqq",
+        needNewCode:0,
+        cid:"205361747",
+        uin:0,
+        songmid,
+        filename,
+        guid:"3397254710",
+        jsonpCallback:"getAudioUrl"
+    }
     const url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg';
-    await axios.get(url,{//同步请求
-        params:{...ctx.query,jsonpCallback:"getAudioUrl"}
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        var res = response.data
-        if (typeof res === 'string') {
-            var matches = res.replace(/^getAudioUrl\(/,"").replace(/\)$/,"")
-            res=JSON.parse(matches)
-        }
-        ctx.body = {
-            ...SUCCESS,
-            msg:"获取歌曲的url成功",
-            data:res//请求结果,
-        };
-    });
+    let response = await axios.get(url,{ params })
+    ctx.response.status = 200;//写入状态
+    var res = response.data
+    if (typeof res === 'string') {
+        var matches = res.replace(/^getAudioUrl\(/,"").replace(/\)$/,"")
+        res=JSON.parse(matches)
+    }
+    ctx.body = {
+        ...SUCCESS,
+        msg:"获取歌曲的url成功",
+        data:res//请求结果,
+    };
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //获取歌曲的key,请求地地址：/service/music/getSingleSong
 router.get("/getSingleSong",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取歌曲的key",method:"getSingleSong",oparation:OPARATION.SELECT};//日志记录
+    let data = await redisClient.get(ctx.req.url);
+    if(data){
+        return ctx.body = data;
+    }
     let {songmid} = ctx.query;
     let params =  {
         jsonpCallback:"getSingleSong",
@@ -546,21 +623,19 @@ router.get("/getSingleSong",async(ctx)=>{
         })
     }
     const url = "https://u.y.qq.com/cgi-bin/musicu.fcg"
-    await axios.get(url,{//同步请求
-        params
-    }).then((response)=>{
-        ctx.response.status = 200;//写入状态
-        var res = response.data
-        if (typeof res === 'string') {
-            var matches = res.replace(/^getSingleSong\(/,"").replace(/\)$/,"")
-            res=JSON.parse(matches)
-        }
-        ctx.body = {
-            ...SUCCESS,
-            msg:"获取歌曲的key成功",
-            data:res//请求结果,
-        };
-    });
+    let response = await axios.get(url,{params});
+    ctx.response.status = 200;//写入状态
+    var res = response.data
+    if (typeof res === 'string') {
+        var matches = res.replace(/^getSingleSong\(/,"").replace(/\)$/,"")
+        res=JSON.parse(matches)
+    }
+    ctx.body = {
+        ...SUCCESS,
+        msg:"获取歌曲的key成功",
+        data:res//请求结果,
+    };
+    redisClient.set(ctx.req.url,ctx.body);
 });
 
 //登录,请求地地址：/service/music/login
