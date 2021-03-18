@@ -1,8 +1,8 @@
 module.exports = {
     SECRET:"wuwenqiang",//秘钥
     ERR_OK: 0,
-    FAIL:{status:"fail"},//失败的状态
-    SUCCESS:{status:"success"},//成功的状态
+    FAIL:{status:"FAIL"},//失败的状态
+    SUCCESS:{status:"SUCCESS"},//成功的状态
     OPARATION:{
         INSERT:"insert",
         DELETE:"delete",
