@@ -3,10 +3,9 @@ const {FAIL} = require("../config")
 //拦截器
 module.exports =  async (ctx,next) => {
     //添加收藏和取消收藏，获取收藏列表需要登录
-    const allowpage = ['/addFavorite','/getFavorite',"/deleteFavorite","/updateUser","/updatePassword","/upload"]
     let url = ctx.originalUrl
     for(let i = 0; i < allowpage.length; i++){
-        if(ctx.originalUrl.indexOf(allowpage[i])!=-1){
+        if(ctx.originalUrl.indexOf("/music-getway/")!=-1){
             let token = ctx.cookies.get("token");
             if(token){
                 var userData = jsonwebtoken.decode(token);
