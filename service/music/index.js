@@ -16,7 +16,8 @@ const {
     RELATIVE_AVATER_PATH,
     TOKEN_OPTIONS,
     INIT_TOKEN_OPTIONS,
-    COOKIE_OPTIONS
+    COOKIE_OPTIONS,
+    HEADERS:headers
 } = require("../../config");
 const {getFullTime,getValue} = require("../../utils/common");
 const redisClient = require("../redisConnect");
@@ -29,11 +30,7 @@ router.get("/getDiscList",async(ctx)=>{
         return ctx.body = data;
     }
     let options = {
-        headers:{//设置请求头
-            referer:'https://c.y.qq.com/',
-            host: 'c.y.qq.com',
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-        },
+        headers,
         params:{
             g_tk: 5381,
             inCharset: "utf-8",
@@ -80,11 +77,7 @@ router.get("/getLyric",async(ctx)=>{
     const url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg';
     let {songmid} = ctx.query;
     let options ={
-        headers:{//设置请求头
-            referer: 'https://c.y.qq.com/',
-            host: 'c.y.qq.com',
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-        },
+        headers,
         params:{
             g_tk: 5381,
             inCharset: "utf-8",
@@ -332,11 +325,7 @@ router.get("/getRecommend",async(ctx)=>{
         return ctx.body = data;
     }
     let options = {
-        headers:{//设置请求头
-            referer: 'https://y.qq.com/',
-            host: 'u.y.qq.com',
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-        },
+        headers,
         params:{
             "-": "recom29349756051626663",
             g_tk: 5381,
@@ -397,11 +386,7 @@ router.get("/getSongList",async(ctx)=>{
     const url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg';
     let {disstid} = ctx.query;
     let response = await axios.get(url,{//同步请求
-        headers: {//设置请求头
-            referer: 'https://y.qq.com/n/yqq/playlist/4151357153.html',
-            host: 'c.y.qq.com',
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-        },
+        headers,
         params:{
             g_tk: 5381,
             inCharset: "utf-8",
