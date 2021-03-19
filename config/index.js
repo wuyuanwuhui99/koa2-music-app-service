@@ -26,7 +26,7 @@ module.exports = {
         httpOnly: false,  // 是否只用于http请求中获取
         overwrite: false  // 是否允许重写
     },
-    headers:{//设置请求头
+    HEADERS:{//设置请求头
         referer:'https://c.y.qq.com/',
         host: 'c.y.qq.com',
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
