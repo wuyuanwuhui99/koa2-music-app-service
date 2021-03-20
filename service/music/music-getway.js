@@ -9,7 +9,7 @@ const {
     FAIL,
     OPARATION,
 } = require("../../config");
-const {getUserId} = require("../../utils/common");
+const {getUserId,getFullTime} = require("../../utils/common");
 
 
 //根据用户id查询收藏的歌曲,请求地地址：/service/music/getFavorite
@@ -293,7 +293,7 @@ router.post("/upload",async(ctx)=>{
     const reader = fs.createReadStream(file.path);
     let ext = file.name.slice(file.name.lastIndexOf(".")+1);//获取文件后缀
     // 创建可写流
-    let filename =  `${userId}_${new Date().getTime()}.${ext}`;
+    let filename =  `${userId}_${getFullTime()}.${ext}`;
     const upStream = fs.createWriteStream(USER_AVATER_PATH + filename);
     let avater = RELATIVE_AVATER_PATH +  filename;
     // 可读流通过管道写入可写流
