@@ -9,15 +9,15 @@ const {
     FAIL,
     OPARATION,
 } = require("../../config");
+const {getUserId} = require("../../utils/common");
 
 
 //根据用户id查询收藏的歌曲,请求地地址：/service/music/getFavorite
 router.get("/getFavorite",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"根据用户id查询收藏的歌曲",method:"getFavorite",oparation:OPARATION.SELECT};//日志记录
     let result = await new Promise((resolve,reject)=>{
-        let token = ctx.cookies.get("token");
-        var userData = jsonwebtoken.decode(token);
-        connection.query("SELECT * FROM favorite_music WHERE user_id = ?",[userData ? userData.userId : ""],function(err,response){
+        let userId = getUserId(ctx)
+        connection.query("SELECT * FROM favorite_music WHERE user_id = ?",[userId],function(err,response){
             if(err){
                 reject(err)
             }else{
@@ -35,7 +35,8 @@ router.get("/getFavorite",async(ctx)=>{
 //查询歌曲收藏,请求地地址：/service/music/queryFavorite
 router.get("/queryFavorite",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"查询歌曲收藏",method:"queryFavorite",oparation:OPARATION.SELECT};//日志记录
-    let {mid,userId} = ctx.query;
+    let {mid} = ctx.query;
+    let userId = getUserId(ctx)
     let result =await new Promise((resolve,reject)=>{
         if(!mid || !userId){//没有歌曲获取用户id
             resolve([]);
@@ -77,7 +78,10 @@ router.post("/addFavorite",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
         let data = [];
         let item = ctx.request.body;
-        let {id,albummid,duration,image,localImage="",mid,name,singer,url,userId,lyric="",localUrl,playMode,kugouUrl} = item;
+        let token = ctx.headers.Authorization;
+        var userData = jsonwebtoken.decode(token);
+        let userId = getUserId(ctx)
+        let {id,albummid,duration,image,localImage="",mid,name,singer,url,lyric="",localUrl,playMode,kugouUrl} = item;
         let updateTime = getFullTime();
         let createTime = getFullTime();
         if(!playMode)playMode = null;
@@ -150,8 +154,9 @@ router.post("/addFavorite",async(ctx)=>{
 router.post("/deleteFavorite",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"取消收藏",method:"deleteFavorite",oparation:OPARATION.DELETE};//日志记录
     let item = ctx.request.body;
+    let userId = getUserId(ctx)
     let result = await new Promise((resolve,reject)=>{
-        connection.query("DELETE FROM favorite_music WHERE id = ? AND user_id = ?",[item.id,item.userId],(error,response)=>{
+        connection.query("DELETE FROM favorite_music WHERE id = ? AND user_id = ?",[item.id,userId],(error,response)=>{
             if(error){
                 console.log("错误",error);
                 reject(error)
@@ -182,7 +187,8 @@ router.put("/updateUser",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"修改用户信息",method:"updateUser",oparation:OPARATION.UPDATE};//日志记录
     let item = ctx.request.body;
     let updateDate =  getFullTime();//当前时间
-    let {username,telephone,email,avater,birthday,sex,role,userId} = item;
+    let userId = getUserId(ctx);
+    let {username,telephone,email,avater,birthday,sex,role} = item;
     if(!username){
         ctx.body = {
             ...FAIL,
@@ -245,7 +251,8 @@ router.put("/updatePassword",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"修改密码",method:"updatePassword",oparation:OPARATION.UPDATE};//日志记录
     let item = ctx.request.body;
     let updateDate =  getFullTime();//当前时间
-    let {newPassword,oldPassword,userId} = item;
+    let userId = getUserId(ctx);
+    let {newPassword,oldPassword} = item;
     let data = [newPassword,updateDate,oldPassword,userId]
     let result = await new Promise((resolve,reject)=>{
         //向记录表中插入一条播放记录，同时更新抖音歌曲的播放次数
@@ -280,22 +287,13 @@ router.put("/updatePassword",async(ctx)=>{
 router.post("/upload",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"文件上传",method:"upload",oparation:OPARATION.UPLOAD};//日志记录
     let file = ctx.request.files.img;
-    let token = ctx.cookies.get("token");
-    let userData = jsonwebtoken.decode(token);
-    if(!userData.userId){
-        return  ctx.body = {
-            ...FAIL,
-            data:null,
-            msg:"token无效",
-        };
-    }
-    userData = {...userData};
+    let userId = getUserId(ctx);
     let updateDate =  getFullTime();//当前时间
     // 创建可读流
     const reader = fs.createReadStream(file.path);
     let ext = file.name.slice(file.name.lastIndexOf(".")+1);//获取文件后缀
     // 创建可写流
-    let filename =  `${userData.userId}_${new Date().getTime()}.${ext}`;
+    let filename =  `${userId}_${new Date().getTime()}.${ext}`;
     const upStream = fs.createWriteStream(USER_AVATER_PATH + filename);
     let avater = RELATIVE_AVATER_PATH +  filename;
     // 可读流通过管道写入可写流
@@ -305,19 +303,22 @@ router.post("/upload",async(ctx)=>{
         //https://www.cnblogs.com/hzj680539/p/8032270.html
         //返回的response[0]表示执行第一条sql的结果，response[1]表示执行第一条sql的结果
         connection.query(`
-            UPDATE user SET avater = ?, update_date = ? WHERE user_id = ?`,[avater,updateDate,userData.userId],(error,response)=>{
+            UPDATE user SET avater = ?, update_date = ? WHERE user_id = ?`,[avater,updateDate,userId],(error,response)=>{
             if(error){
                 console.log("错误",error);
                 reject(error)
             }else{
-                userData.avater = avater;
-                let token = jsonwebtoken.sign(userData,SECRET, TOKEN_OPTIONS);
-                ctx.cookies.set("token",token,COOKIE_OPTIONS)
-                resolve({
-                    ...SUCCESS,
-                    data:userData,
-                    msg:"修改头像成功",
-                });
+                connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE user_id = ?",userId,(error,response)=>{
+                    var userData = JSON.parse(JSON.stringify(response[0]));
+                    var token =  jsonwebtoken.sign(userData,SECRET, TOKEN_OPTIONS);
+                    resolve({
+                        ...SUCCESS,
+                        msg:"修改头像成功",
+                        data:userData,
+                        token
+                    })
+                })
+
             }
         });
     })

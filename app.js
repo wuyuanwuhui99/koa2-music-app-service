@@ -52,7 +52,6 @@ app.use(koaBody({
   }
 }));
 app.use(log);//日志记录
-app.use(setCookie);//设置cookie
 app.use(bodyparser({
   enableTypes:['json', 'form', 'text']
 }))
@@ -74,35 +73,6 @@ const CONFIG = {
   renew:false
 }
 app.use(session(CONFIG, app));
-
-//session拦截
-app.use(async (ctx, next) => {
-  //添加收藏和取消收藏，获取收藏列表需要登录
-  const allowpage = ['/addFavorite','/getFavorite',"/deleteFavorite"]
-  let url = ctx.originalUrl
-  for(let i = 0; i < allowpage.length; i++){
-    if(ctx.originalUrl.indexOf(allowpage[i])!=-1){
-      // if(!ctx.session.userId){//登录判断
-      //   ctx.body = {
-      //     msg:"未登录"
-      //   }
-      //   ctx.status = 403;
-      //   return;
-      // }
-      let token = ctx.cookies.get("token");
-      if(token){
-
-      }else{
-        ctx.body = {
-          msg:"未登录"
-        }
-        ctx.status = 403;
-        return ;
-      }
-    }
-  }
-  await next()
-})
 
 // logger
 app.use(async (ctx, next) => {

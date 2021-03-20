@@ -1,6 +1,8 @@
+const jsonwebtoken = require("jsonwebtoken");
+
 const zerofill = (value)=>  {
         return value < 10 ? "0"+value : value+"";
-    };
+};
 
 const getFullTime = (date)=>{
     if(!date) date = new Date()
@@ -23,4 +25,19 @@ const getValue=(data,props,defaultValue)=>{
     }
     return result
 }
-module.exports = {zerofill,getFullTime,getValue}
+
+const getUserId = (ctx)=>{
+    let token = ctx.headers.Authorization;
+    var userData = jsonwebtoken.decode(token);
+    return userData ? userData.userId : null;
+}
+
+const getParams = (obj)=>{
+    var str = ""
+    for(var key in obj){
+        str += `&${key}=${obj[key]}`
+    }
+    return str.replace(/&/,"?")
+}
+
+module.exports = {zerofill,getFullTime,getValue,getUserId,getParams}
