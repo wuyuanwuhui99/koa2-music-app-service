@@ -27,7 +27,7 @@ const getValue=(data,props,defaultValue)=>{
 }
 
 const getUserId = (ctx)=>{
-    let token = ctx.headers.Authorization;
+    let token = ctx.headers.authorization;
     var userData = jsonwebtoken.decode(token);
     return userData ? userData.userId : null;
 }

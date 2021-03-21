@@ -17,7 +17,26 @@ router.get("/getFavorite",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"根据用户id查询收藏的歌曲",method:"getFavorite",oparation:OPARATION.SELECT};//日志记录
     let result = await new Promise((resolve,reject)=>{
         let userId = getUserId(ctx)
-        connection.query("SELECT * FROM favorite_music WHERE user_id = ?",[userId],function(err,response){
+        connection.query(`SELECT 
+            id,
+            albummid,
+            duration,
+            mid,
+            name,
+            singer,
+            url,
+            create_time AS createTime,
+            timer,
+            update_time AS updateTime,
+            kugou_url AS kugouUrl,
+            play_mode AS playMode,
+            other_url AS otherUrl,
+            local_url AS localUrl,
+            disabled,
+            user_id AS userId,
+            lyric,
+            local_image AS localImage
+        FROM favorite_music WHERE user_id = ?`,[userId],function(err,response){
             if(err){
                 reject(err)
             }else{
@@ -39,30 +58,15 @@ router.get("/queryFavorite",async(ctx)=>{
     let userId = getUserId(ctx)
     let result =await new Promise((resolve,reject)=>{
         if(!mid || !userId){//没有歌曲获取用户id
-            resolve([]);
+            resolve({
+                data:result.length,
+                ...SUCCESS,
+                msg:"查询成功",
+            });
         }else{
-            connection.query(`SELECT 
-            id,
-            albummid,
-            duration,
-            mid,
-            name,
-            singer,
-            url,
-            create_time AS createTime,
-            timer,
-            update_time AS updateTime,
-            kugou_url AS kugouUrl,
-            play_mode AS playMode,
-            other_url AS otherUrl,
-            local_url AS localUrl,
-            disabled,
-            user_id AS userId,
-            lyric,
-            local_image AS localImage
-        FROM favorite_music WHERE mid = ? AND user_id = ?`,[mid,userId],(err,result)=>{
+            connection.query(`SELECT * FROM favorite_music WHERE mid = ? AND user_id = ?`,[mid,userId],(err,result)=>{
                 resolve({
-                    data:result,
+                    data:result.length,
                     ...SUCCESS,
                     msg:"查询成功",
                 })
