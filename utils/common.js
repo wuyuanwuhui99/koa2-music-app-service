@@ -1,4 +1,7 @@
 const jsonwebtoken = require("jsonwebtoken");
+const { CHEADERS: cheaders, UHEADERS: uheaders,ERR_OK,SUCCESS} = require("../config")
+const axios = require("axios");
+const redisClient = require("./redisConnect");
 
 const zerofill = (value)=>  {
         return value < 10 ? "0"+value : value+"";
@@ -40,4 +43,45 @@ const getParams = (obj)=>{
     return str.replace(/&/,"?")
 }
 
-module.exports = {zerofill,getFullTime,getValue,getUserId,getParams}
+const getQQMusicData = async (url, methodName="",queryString="") =>{
+    return new Promise(async (resolve, reject) => {
+        let data = await redisClient.get(url);
+        if (data) {
+            resolve(data)
+            return;
+        }
+        let response = await axios.get(url + queryString, {headers:url.includes("c.y.qq.com") ? cheaders : uheaders});
+        var res = response.data,body;//请求结果
+        if (typeof res === 'string') {
+            if (methodName == "getLyric") {
+                var reg = /^\w+\(({[^()]+})\)$/
+                var matches = res.match(reg)
+                if (matches) {
+                    res = JSON.parse(matches[1])
+                }
+            } else if(methodName){
+                var reg = new RegExp(methodName + "\\(|\\)$","g")
+                var matches = res.trim().replace(reg,"")
+                res = JSON.parse(matches)
+            }
+        }
+        if (res.code == ERR_OK || res.code === undefined) {
+            body = {
+                ...SUCCESS,
+                msg: "",
+                data: res.data || res//请求结果,
+            };
+        } else{
+            body = {
+                ...FAIL,
+                msg: res.message,
+                data: res.data || res//请求结果,
+            };
+        }
+        redisClient.set(url, body);
+        resolve(body);
+    })
+
+}
+
+module.exports = {zerofill,getFullTime,getValue,getUserId,getParams,getQQMusicData}

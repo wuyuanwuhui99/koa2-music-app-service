@@ -2,7 +2,7 @@
  *@description 连接redis的方法，get set
  *@author bokolin
  */
-const redis = require('redis')
+const redis = require('_redis@3.0.2@redis')
 const { REDIS_CONF } = require('../config/redis');
 //创建客户端
 const redisClient = redis.createClient(REDIS_CONF.port,REDIS_CONF.host)
