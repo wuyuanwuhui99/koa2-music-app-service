@@ -21,9 +21,11 @@ module.exports =  async (ctx,next) => {
         }
         var result = ctx.body;
         var runTime = runtime;
-        var userData = jsonwebtoken.decode(ctx.cookies.get("token"));
+        var userData = jsonwebtoken.decode(ctx.headers.authorization);
         var userId = userData ? userData.userId : null;
+        var token = jsonwebtoken.encode(userData)
         var {description=null,method=null,oparation=null} = ctx.state.bodyAttribs;
+        ctx.body.token = token;
         connection.query(`INSERT INTO log(
             method,url,headers,ip,params,result,start_time,run_time,description,end_time,oparation,type,user_id,app_id,app_name)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
