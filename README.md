@@ -6,3 +6,12 @@
 ![](https://raw.githubusercontent.com/wuyuanwuhui99/vue_music/main/music_01.jpg)
 ![](https://raw.githubusercontent.com/wuyuanwuhui99/vue_music/main/music_02.jpg)
 ![](https://raw.githubusercontent.com/wuyuanwuhui99/vue_music/main/music_03.jpg)
+
+
+在线音乐和电影后端接口项目和sql语句：https://github.com/wuyuanwuhui99/springboot-app-service
+
+flutter在线电影项目：https://github.com/wuyuanwuhui99/flutter-movie-app-ui
+
+react native版本在线电影项目: https://github.com/wuyuanwuhui99/react-native-app-ui
+
+vue在线音乐项目：https://github.com/wuyuanwuhui99/vue-music-app-ui
