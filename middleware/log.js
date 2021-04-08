@@ -1,7 +1,12 @@
 const connection = require("../service/connection");
 const {getFullTime} = require("../utils/common");
 const jsonwebtoken = require("jsonwebtoken");
-const {APPID,APPNAME} = require("../config")
+const {APPID,APPNAME} = require("../config");
+const {
+    SECRET,
+    TOKEN_OPTIONS
+} = require("../config");
+
 module.exports =  async (ctx,next) => {
     if(ctx.originalUrl.includes("/service/music/")){
         var startDate = new  Date();
@@ -23,7 +28,7 @@ module.exports =  async (ctx,next) => {
         var userData = jsonwebtoken.decode(ctx.headers.authorization);
         if(userData){
             userId = userData ? userData.userId : null;
-            var token = jsonwebtoken.encode(userData);
+            var token = jsonwebtoken.sign(userData,SECRET,TOKEN_OPTIONS);
             ctx.body.token = token;
         }
         var {description=null,method=null,oparation=null} = ctx.state.bodyAttribs;
