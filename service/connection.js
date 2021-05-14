@@ -1,6 +1,6 @@
 var mysql=require("mysql");
 var pool = mysql.createPool({
-    host: 'localhost',
+    host: '192.168.0.103',
     user:'root',
     password:'wwq_2021',
     database:'play',
@@ -12,7 +12,7 @@ var query=function(sql,options,callback){
 
   pool.getConnection(function(err,conn){
       if(err){
-          callback(err,null,null);
+          if(callback)callback(err,null,null);
       }else{
           conn.query(sql,options,function(err,results,fields){
               //事件驱动回调
