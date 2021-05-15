@@ -6,7 +6,6 @@ const jsonwebtoken = require("jsonwebtoken");
 const redisClient = require("../../utils/redisConnect");
 const router = new Router();
 const {
-    ERR_OK,
     SUCCESS,
     FAIL,
     OPARATION,
@@ -86,8 +85,6 @@ router.post("/addFavorite",async(ctx)=>{
     let result = await new Promise((resolve,reject)=>{
         let data = [];
         let item = ctx.request.body;
-        let token = ctx.headers.Authorization;
-        var userData = jsonwebtoken.decode(token);
         let userId = getUserId(ctx)
         let {id,albummid,duration,image,localImage="",mid,name,singer,url,lyric="",localUrl,playMode,kugouUrl} = item;
         let updateTime = getFullTime();
@@ -138,7 +135,7 @@ router.post("/addFavorite",async(ctx)=>{
                         if(image){//把图片下载到本地
                             let imgMatch = image.replace(/\?.+/g,"").split(".");
                             let imgFilename = name +"."+ imgMatch[imgMatch.length -1];
-                            let imgRoot = "F:\\static\\music\\images\\" + imgFilename;
+                            let imgRoot = "F:\\static\\music\\images\\song\\" + imgFilename;
                             let imgStream = fs.createWriteStream(imgRoot);
                             request(item.image).pipe(imgStream).on('close', ()=>{//下载文件成功后更新数据库
                                 connection.query("UPDATE douyin SET local_image = ? WHERE id = ?",["/static/music/images/song/"+imgFilename,id],(err,res)=>{
