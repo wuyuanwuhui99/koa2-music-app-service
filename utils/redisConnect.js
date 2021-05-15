@@ -45,6 +45,18 @@ const get=(key)=>{
     })
 }
 
+/**
+ *
+ * @param {string} key
+ */
+const del=(key)=>{
+    return new Promise((resolve, reject)=>{
+        redisClient.del(key,(err)=>{
+            resolve()
+        })
+    })
+}
+
 module.exports = {
-    set,get
+    set,get,del
 }

@@ -1,8 +1,10 @@
 const fs = require("fs");
 const Router = require("koa-router");
 const connection = require("../connection");
-const router = new Router();
+const request = require("request")
 const jsonwebtoken = require("jsonwebtoken");
+const redisClient = require("../../utils/redisConnect");
+const router = new Router();
 const {
     ERR_OK,
     SUCCESS,
@@ -117,27 +119,29 @@ router.post("/addFavorite",async(ctx)=>{
                     connection.query(`INSERT INTO douyin(id,albummid,duration,image,local_image,mid,name,singer,url,create_time,update_time,lyric) SELECT ?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE exists(SELECT role FROM user WHERE user_id=? AND role = 'admin') AND NOT EXISTS (SELECT albummid FROM douyin WHERE albummid=?)`,[...params],(error,response)=>{
                         if(!response)return;
                         if(url){//把歌曲下载到本地
+                            redisClient.del("/server/music/getDouyin")
                             let audioMatch = url.replace(/\?.+/,"").split(".");
                             let audioFilename =  name+"."+audioMatch[audioMatch.length-1];
-                            let audioRoot = "E:\\static\\music\\audio\\"+ audioFilename;
+                            let audioRoot = "F:\\static\\music\\audio\\"+ audioFilename;
                             let audioStream = fs.createWriteStream(audioRoot);
                             request(url).pipe(audioStream).on('close', ()=>{//下载文件成功后更新数据库
                                 connection.query("UPDATE douyin SET local_url = ?,play_mode='local' WHERE id=?",["/audio/"+audioFilename,id],(err,res)=>{
                                     console.log(err,res,"下载音乐成功，更新数据库成功")
+
                                 })
                             });
                         }else{
-                            connection.query("UPDATE douyin SET local_url = ?,play_mode='local' WHERE id=?",[`/audio/${name}.m4a`,id],(err,res)=>{
+                            connection.query("UPDATE douyin SET local_url = ?,play_mode='local' WHERE id=?",[`/static/music/audio/${name}.m4a`,id],(err,res)=>{
                                 console.log(err,res,"下载音乐失败，更新数据库成功")
                             })
                         }
                         if(image){//把图片下载到本地
                             let imgMatch = image.replace(/\?.+/g,"").split(".");
                             let imgFilename = name +"."+ imgMatch[imgMatch.length -1];
-                            let imgRoot = "E:\\static\\music\\images\\" + imgFilename;
+                            let imgRoot = "F:\\static\\music\\images\\" + imgFilename;
                             let imgStream = fs.createWriteStream(imgRoot);
                             request(item.image).pipe(imgStream).on('close', ()=>{//下载文件成功后更新数据库
-                                connection.query("UPDATE douyin SET local_image = ? WHERE id = ?",["/images/song/"+imgFilename,id],(err,res)=>{
+                                connection.query("UPDATE douyin SET local_image = ? WHERE id = ?",["/static/music/images/song/"+imgFilename,id],(err,res)=>{
                                     console.log(err,res,"下载图片成功，更新数据库成功")
                                 })
                             });

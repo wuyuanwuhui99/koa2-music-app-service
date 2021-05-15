@@ -58,7 +58,7 @@ router.get("/getHotKey",async(ctx)=>{
 router.get("/search",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"搜索",method:"search",oparation:OPARATION.SELECT};
     let {catZhida,p,n,w} = ctx.query;
-    const url = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&inCharset=utf-8&outCharset=utf-8&notice=0&format=jsonp&ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.center&searchid=37276201631470540&t=0&aggr=1&cr=1&lossless=0&flag_qc=0&loginUin=0&hostUin=0&platform=yqq&needNewCode=1&jsonpCallback=search&catZhida="+catZhida+"&p="+p+"&n="+n+"&w="+w;
+    const url = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?g_tk=5381&inCharset=utf-8&outCharset=utf-8&notice=0&format=jsonp&ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.center&searchid=37276201631470540&t=0&aggr=1&cr=1&lossless=0&flag_qc=0&loginUin=0&hostUin=0&platform=yqq&needNewCode=1&jsonpCallback=search&catZhida="+catZhida+"&p="+p+"&n="+n+"&w="+encodeURIComponent(w);
     ctx.response.status = 200;//写入状态
     ctx.body = await getQQMusicData(url,"search","");//从缓存中获取数据，如果缓存没有再从接口中获取数据
 });
@@ -202,6 +202,7 @@ router.get("/getUserData",async(ctx)=>{
     ctx.state.bodyAttribs = {description:"获取用户信息",method:"getUserData",oparation:OPARATION.SELECT};//日志记录
     let result = await new Promise((resolve,reject)=>{
         let userId = getUserId(ctx)
+        // userId = "吴怨吴悔"
         if(userId){
             connection.query("SELECT user_id AS userId,create_date AS createDate ,update_date AS updateDate,username,telephone,email,avater,birthday,sex,role from  user WHERE user_id = ?",userId,(error,response)=>{
                 var userData = JSON.parse(JSON.stringify(response[0]));

@@ -51,7 +51,7 @@ const getQQMusicData = async (url, methodName="",queryString="") =>{
             return;
         }
         let response = await axios.get(url + queryString, {headers:url.includes("c.y.qq.com") ? cheaders : uheaders});
-        var res = response.data,body;//请求结果
+        var res = response.data;//请求结果
         if (typeof res === 'string') {
             if (methodName == "getLyric") {
                 var reg = /^\w+\(({[^()]+})\)$/
