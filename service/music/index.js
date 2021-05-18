@@ -33,7 +33,7 @@ router.get("/getLyric",async(ctx)=>{
     ctx.response.status = 200;//写入状态
     ctx.body = await getQQMusicData(url,"getLyric",queryString);//从缓存中获取数据，如果缓存没有再从接口中获取数据
     //把歌词保存到数据库
-    connection.query("UPDATE douyin SET lyric=? WHERE mid=? AND lyric IS NULL",[encodeURIComponent(Base64.decode(ctx.body.data.lyric)),ctx.query.songmid],(error,response)=>{
+    connection.query("UPDATE music_douyin SET lyric=? WHERE mid=? AND lyric IS NULL",[encodeURIComponent(Base64.decode(ctx.body.data.lyric)),ctx.query.songmid],(error,response)=>{
         console.log(response)
     });
 });
@@ -259,7 +259,7 @@ router.get("/getDouyinList",async(ctx)=>{
             disabled,
             lyric,
             local_image AS localImage
-        FROM douyin 
+        FROM music_douyin 
             WHERE disabled = '0' order by update_time desc limit 0 ,100`,(error,response)=>{
             if(error){
                 console.log("错误",error);
@@ -289,9 +289,9 @@ router.post("/record",async(ctx)=>{
         //https://www.cnblogs.com/hzj680539/p/8032270.html
         //返回的response[0]表示执行第一条sql的结果，response[1]表示执行第一条sql的结果
         connection.query(`
-            INSERT INTO record_music(id,albummid,duration,image,mid,name,singer,url,user_id,create_time) VALUES ?;
-            UPDATE douyin SET timer = timer+1 WHERE id = ?;
-            UPDATE douyin SET url=? WHERE id = ? AND url='';`,
+            INSERT INTO music_record(id,albummid,duration,image,mid,name,singer,url,user_id,create_time) VALUES ?;
+            UPDATE music_douyin SET timer = timer+1 WHERE id = ?;
+            UPDATE music_douyin SET url=? WHERE id = ? AND url='';`,
             [data,id,url,id],(error,response)=>{
                 if(error){
                     console.log("错误",error);

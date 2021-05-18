@@ -39,7 +39,7 @@ router.get("/getFavorite",async(ctx)=>{
             user_id AS userId,
             lyric,
             local_image AS localImage
-        FROM favorite_music WHERE user_id = ?`,[userId],function(err,response){
+        FROM music_favorite WHERE user_id = ?`,[userId],function(err,response){
             if(err){
                 reject(err)
             }else{
@@ -67,7 +67,7 @@ router.get("/queryFavorite",async(ctx)=>{
                 msg:"查询成功",
             });
         }else{
-            connection.query(`SELECT * FROM favorite_music WHERE mid = ? AND user_id = ?`,[mid,userId],(err,result)=>{
+            connection.query(`SELECT * FROM music_favorite WHERE mid = ? AND user_id = ?`,[mid,userId],(err,result)=>{
                 resolve({
                     data:result.length,
                     ...SUCCESS,
@@ -94,8 +94,8 @@ router.post("/addFavorite",async(ctx)=>{
         let params =[id,albummid,duration,image,localImage,mid,name,singer,url,createTime,updateTime,lyric,userId,albummid];//插入抖音的参数
         //往收藏表中插入一条数据，要管理员才能插入都抖音歌曲表
         connection.query(
-            `INSERT INTO favorite_music(id,albummid,duration,image,local_image,mid,name,singer,url,user_id,create_time,lyric,local_url,play_mode,update_time,kugou_url) 
-                SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE NOT EXISTS (SELECT id,name FROM favorite_music WHERE id=? AND user_id= ?);
+            `INSERT INTO music_favorite(id,albummid,duration,image,local_image,mid,name,singer,url,user_id,create_time,lyric,local_url,play_mode,update_time,kugou_url) 
+                SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE NOT EXISTS (SELECT id,name FROM music_favorite WHERE id=? AND user_id= ?);
         `,[...data,id,userId],(error,response)=>{
                 //要管理员才能插入都抖音歌曲表
                 if(!error){
@@ -113,7 +113,7 @@ router.post("/addFavorite",async(ctx)=>{
                         })
                     }
                     //如果是管理员账号，收藏之后添加到抖音歌曲表
-                    connection.query(`INSERT INTO douyin(id,albummid,duration,image,local_image,mid,name,singer,url,create_time,update_time,lyric) SELECT ?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE exists(SELECT role FROM user WHERE user_id=? AND role = 'admin') AND NOT EXISTS (SELECT albummid FROM douyin WHERE albummid=?)`,[...params],(error,response)=>{
+                    connection.query(`INSERT INTO music_douyin(id,albummid,duration,image,local_image,mid,name,singer,url,create_time,update_time,lyric) SELECT ?,?,?,?,?,?,?,?,?,?,?,? FROM DUAL WHERE exists(SELECT role FROM user WHERE user_id=? AND role = 'admin') AND NOT EXISTS (SELECT albummid FROM music_douyin WHERE albummid=?)`,[...params],(error,response)=>{
                         if(!response)return;
                         if(url){//把歌曲下载到本地
                             redisClient.del("/server/music/getDouyin")
@@ -122,13 +122,13 @@ router.post("/addFavorite",async(ctx)=>{
                             let audioRoot = "F:\\static\\music\\audio\\"+ audioFilename;
                             let audioStream = fs.createWriteStream(audioRoot);
                             request(url).pipe(audioStream).on('close', ()=>{//下载文件成功后更新数据库
-                                connection.query("UPDATE douyin SET local_url = ?,play_mode='local' WHERE id=?",["/audio/"+audioFilename,id],(err,res)=>{
+                                connection.query("UPDATE music_douyin SET local_url = ?,play_mode='local' WHERE id=?",["/audio/"+audioFilename,id],(err,res)=>{
                                     console.log(err,res,"下载音乐成功，更新数据库成功")
 
                                 })
                             });
                         }else{
-                            connection.query("UPDATE douyin SET local_url = ?,play_mode='local' WHERE id=?",[`/static/music/audio/${name}.m4a`,id],(err,res)=>{
+                            connection.query("UPDATE music_douyin SET local_url = ?,play_mode='local' WHERE id=?",[`/static/music/audio/${name}.m4a`,id],(err,res)=>{
                                 console.log(err,res,"下载音乐失败，更新数据库成功")
                             })
                         }
@@ -138,7 +138,7 @@ router.post("/addFavorite",async(ctx)=>{
                             let imgRoot = "F:\\static\\music\\images\\song\\" + imgFilename;
                             let imgStream = fs.createWriteStream(imgRoot);
                             request(item.image).pipe(imgStream).on('close', ()=>{//下载文件成功后更新数据库
-                                connection.query("UPDATE douyin SET local_image = ? WHERE id = ?",["/static/music/images/song/"+imgFilename,id],(err,res)=>{
+                                connection.query("UPDATE music_douyin SET local_image = ? WHERE id = ?",["/static/music/images/song/"+imgFilename,id],(err,res)=>{
                                     console.log(err,res,"下载图片成功，更新数据库成功")
                                 })
                             });
@@ -163,7 +163,7 @@ router.post("/deleteFavorite",async(ctx)=>{
     let item = ctx.request.body;
     let userId = getUserId(ctx)
     let result = await new Promise((resolve,reject)=>{
-        connection.query("DELETE FROM favorite_music WHERE id = ? AND user_id = ?",[item.id,userId],(error,response)=>{
+        connection.query("DELETE FROM music_favorite WHERE id = ? AND user_id = ?",[item.id,userId],(error,response)=>{
             if(error){
                 console.log("错误",error);
                 reject(error)
